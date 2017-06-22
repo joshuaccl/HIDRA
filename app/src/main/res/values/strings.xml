@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">IoT SAP</string>
+
+    <!-- Settings strings -->
+    <string name="settings_bluetooth_service">Bluetooth background search service</string>
+    <string name="settings_bluetooth_service_summ">Enable bluetooth search polling</string>
+    <string name="settings_ble_service">Bluetooth Low Energy background search service</string>
+    <string name="settings_ble_service_summ">Enable BLE search polling</string>
+    <string name="settings_nfc_service">NFC background service</string>
+    <string name="settings_nfc_service_summ">Enable NFC background response</string>
+
+    <!-- Temporary Strings -->
+    <string name="map_fragment_default">Hello from map fragment!</string>
+    <string name="task_fragment_default">Hello from TASK fragment!!</string>
+</resources>
