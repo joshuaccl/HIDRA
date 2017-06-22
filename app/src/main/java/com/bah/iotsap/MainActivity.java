@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity {
 
         /**
          * Use to retrieve a fragment at a particular position.
-         * Usage: MapFragment frag = (MapFragment) pagerAdapter.getFragmentAt(NFC_INDEX);
+         * Usage: MapFragment frag = (MapFragment) pagerAdapter.getFragmentAt(MAP_INDEX);
          * @param position
          * @return Fragment
          */
