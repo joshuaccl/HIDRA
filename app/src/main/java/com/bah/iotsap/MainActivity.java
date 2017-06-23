@@ -53,7 +53,7 @@ public class MainActivity extends FragmentActivity {
                 case 0:  return new SettingsFragment();
                 case 1:  return new MapFragment();
                 case 2:  return new TaskFragment(); // Bluetooth fragment
-                case 3:  return new TaskFragment(); // BLE fragment
+                case 3:  return new BleFragment(); // BLE fragment
                 case 4:  return new TaskFragment(); // NFC fragment
                 default: return null;
             }
