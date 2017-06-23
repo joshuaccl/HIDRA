@@ -48,9 +48,16 @@ public class MainActivity extends FragmentActivity {
         viewPager.setCurrentItem(START_INDEX);
         Log.i(TAG, "onCreate: Finished pagerAdapter / viewPager setup");
 
+        /**
+         * Start the primary ServiceManager which is in charge
+         * of starting and stopping all other discovery services.
+         */
         startService(new Intent(this, ServiceManager.class));
     }
 
+    /**
+     * Class used to swipe between different fragments.
+     */
     private static class PagerAdapter extends FragmentPagerAdapter {
 
         SparseArray<Fragment> registeredFragments = new SparseArray<>(NUM_FRAGMENTS);
