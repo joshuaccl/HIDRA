@@ -17,11 +17,15 @@ public class ServiceManager extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
+        // TODO: Get and check permissions before launching services
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
+        Log.i(TAG, "onStartCommand(): Starting BluetoothDiscoveryService");
+        startService(new Intent(this, BluetoothDiscoveryService.class));
+
         return super.onStartCommand(intent, flags, startId);
     }
 
