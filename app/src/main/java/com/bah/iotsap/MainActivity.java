@@ -1,16 +1,17 @@
 package com.bah.iotsap;
 
+import android.Manifest;
 import android.app.Fragment;
-import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
-
-import com.bah.iotsap.services.ServiceManager;
 
 /**
  * This activity is basically a container for various fragments. It consists
@@ -49,10 +50,13 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "onCreate: Finished pagerAdapter / viewPager setup");
 
         /**
-         * Start the primary ServiceManager which is in charge
-         * of starting and stopping all other discovery services.
+         * Request permission for fine location if it is not already granted
          */
-        startService(new Intent(this, ServiceManager.class));
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+           != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "onCreate(): Requesting FINE LOCATION permission");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        }
     }
 
     /**
