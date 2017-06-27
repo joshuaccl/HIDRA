@@ -54,12 +54,9 @@ public class ServiceManager extends Service {
         Log.i(TAG, "onCreate()");
 
         IntentFilter filter = new IntentFilter();
-        // Bluetooth: Tell if adapter is turned on or off
-        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        // Wifi: indicates enable, disable, disabling, unknown
-        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        // Wifi: connectivity to network changes
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);   // Adapter on or off?
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);   // Enabled, disabled, enabling?
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);// Network connectivity change?
         registerReceiver(receiver, filter);
     }
 
@@ -67,18 +64,21 @@ public class ServiceManager extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
 
-        // Check each permission and set corresponding booleans
-        // BLUETOOTH CHECK
-        btAdapterEnabled = BluetoothAdapter.getDefaultAdapter().isEnabled();
-        // FINE LOCATION CHECK
-        fineLocationEnabled = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                           == PackageManager.PERMISSION_GRANTED;
-
-
-        // Act accordingly for initial launch of services.
-        if(btAdapterEnabled && !btDiscEnabled) {
-            Log.i(TAG, "onStartCommand(): bt adapter enabled, starting btDiscService");
-            startService(new Intent(this, BluetoothDiscoveryService.class));
+        if(intent != null && intent.getAction().equals(START_INTENT_ACTION)) {
+            /**
+             * Ensure that bluetooth and fine location are enabled and usable,
+             * Start which ever services are available at this time.
+             */
+            btAdapterEnabled = BluetoothAdapter.getDefaultAdapter().isEnabled();
+            fineLocationEnabled = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED;
+            if (btAdapterEnabled && !btDiscEnabled) {
+                Log.i(TAG, "onStartCommand(): bt adapter enabled, starting btDiscService");
+                btDiscEnabled = true;
+                startService(new Intent(this, BluetoothDiscoveryService.class));
+            }
+        } else if(intent != null && intent.getAction().equals(STOP_INTENT_ACTION)) {
+            // TODO: STOP THE SERVICE AND ALL SUBSERVICES
         }
         return super.onStartCommand(intent, flags, startId);
     }

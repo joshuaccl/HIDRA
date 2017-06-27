@@ -2,6 +2,7 @@ package com.bah.iotsap;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
+
+import com.bah.iotsap.services.BluetoothDiscoveryService;
+import com.bah.iotsap.services.ServiceManager;
 
 /**
  * This activity is basically a container for various fragments. It consists
@@ -57,6 +61,17 @@ public class MainActivity extends FragmentActivity {
             Log.i(TAG, "onCreate(): Requesting FINE LOCATION permission");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
+
+        /**
+         * Start the ServiceManager service
+         */
+        startService(new Intent(ServiceManager.START_INTENT_ACTION, null, this, ServiceManager.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(ServiceManager.STOP_INTENT_ACTION, null, this, ServiceManager.class));
+        super.onDestroy();
     }
 
     /**
@@ -82,10 +97,11 @@ public class MainActivity extends FragmentActivity {
             Log.i(TAG, "PagerAdapter: getItem, position = " + position);
             switch(position) {
                 case PREF_INDEX: registeredFragments.put(position, new SettingsFragment()); break;
-                case MAP_INDEX : registeredFragments.put(position, new MapFragment()); break;
-                case BT_INDEX  :
-                case BLE_INDEX :
-                case NFC_INDEX : registeredFragments.put(position, new TaskFragment()); break;
+                case MAP_INDEX : registeredFragments.put(position, new MapFragment());      break;
+                case BT_INDEX  : registeredFragments.put(position, ItemFragment.newInstance(
+                                    BluetoothDiscoveryService.RECEIVE_JSON)); break;
+                case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance()); break;
+                case NFC_INDEX : registeredFragments.put(position, ItemFragment.newInstance()); break;
                 default: break;
             }
             return registeredFragments.get(position);

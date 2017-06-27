@@ -8,10 +8,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class BluetoothDiscoveryService extends Service {
 
+    /**
+     * This public static String can be used to register receivers, used primarily
+     * for receiving JSON data outside of this service from this service.
+     */
+    public  static final String RECEIVE_JSON = "com.bah.iotsap.services.RECEIVE_JSON";
     private static final String TAG = "BTDiscoveryService";
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -20,13 +32,31 @@ public class BluetoothDiscoveryService extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "onReceive()");
             String action = intent.getAction();
-            // Discovery found a device, get its information here
+
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get information from discovered devices
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 String deviceName = device.getName();
                 String deviceMAC  = device.getAddress();
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-                Log.i(TAG, "receiver: " + "name: " + deviceName + "MAC: " + deviceMAC + "RSSI: " + rssi);
+                String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                Log.i(TAG, "receiver: " + " name: " + deviceName + " MAC: " + deviceMAC +
+                           " RSSI: " + rssi + " Date: " + date);
+
+                // Send information in local broadcast using JSON format
+                JSONObject item = new JSONObject();
+                try {
+                    Log.i(TAG, "Creating JSONObject and sending through local Intent");
+                    item.put("date", date);
+                    item.put("mac", deviceMAC);
+                    item.put("name", deviceName);
+                    item.put("rssi", rssi);
+                    Intent deviceInfo = new Intent(RECEIVE_JSON);
+                    deviceInfo.putExtra("json", item.toString());
+                    Log.i(TAG, item.toString());
+                    LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
+                } catch(JSONException e) {}
+
             } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "onReceive(): Restarting BT discovery");
                 btAdapter.startDiscovery();
