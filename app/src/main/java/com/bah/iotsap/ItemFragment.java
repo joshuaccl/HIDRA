@@ -4,6 +4,7 @@ import android.app.ListFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class ItemFragment extends ListFragment {
 
-    private static final String TAG = "ListFragment";
+    private static final String TAG = "ItemFragment";
 
     private String               action;
     private ListView             listView;
@@ -31,7 +32,8 @@ public class ItemFragment extends ListFragment {
             Log.i(TAG, "onReceive()");
             if(intent.getAction().equals(action)) {
                 Log.i(TAG, "onReceive(): received action " + action);
-                list.add(intent.getAction());
+                list.add(intent.getStringExtra("json"));
+                Log.i(TAG, "onReceive(): JSON: " + intent.getStringExtra("json"));
                 adapter.notifyDataSetChanged();
             }
         }
@@ -75,6 +77,13 @@ public class ItemFragment extends ListFragment {
         return inflater.inflate(R.layout.fragment_item, container, false);
     }
 
+    /**
+     * This method is called once a view is created (duh).
+     * This is where any object needs to be instantiated if they
+     * do not currently exist.
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -91,6 +100,29 @@ public class ItemFragment extends ListFragment {
         if(bundle != null && bundle.get("action") != null) {
             action = (String) bundle.get("action");
             Log.i(TAG, "onViewCreated(): action = " + action);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume()");
+        if(action != null) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(action);
+            getActivity().registerReceiver(receiver, filter);
+            Log.i(TAG, "onResume(): Registering receiver for action " + action);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            Log.i(TAG, "onPause(): unregister Receiver");
+            getActivity().unregisterReceiver(receiver);
+        } catch(Exception e) {
+            Log.i(TAG, "onPause(): Caught exception unregister receiver");
         }
     }
 }

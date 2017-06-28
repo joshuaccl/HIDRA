@@ -51,11 +51,15 @@ public class BluetoothDiscoveryService extends Service {
                     item.put("mac", deviceMAC);
                     item.put("name", deviceName);
                     item.put("rssi", rssi);
-                    Intent deviceInfo = new Intent(RECEIVE_JSON);
+                    Intent deviceInfo = new Intent();
+                    deviceInfo.setAction(RECEIVE_JSON);
                     deviceInfo.putExtra("json", item.toString());
                     Log.i(TAG, item.toString());
-                    LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
-                } catch(JSONException e) {}
+                    //LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
+                    sendBroadcast(deviceInfo);
+                } catch(JSONException e) {
+                    Log.i(TAG, "onReceive(): Caught JSON Exception");
+                }
 
             } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "onReceive(): Restarting BT discovery");
@@ -94,7 +98,9 @@ public class BluetoothDiscoveryService extends Service {
         Log.i(TAG, "onStartCommand(): Discovering devices");
         btAdapter.startDiscovery();
 
-        return super.onStartCommand(intent, flags, startId);
+        // This prevents the service from restarting after it is killed
+        return START_NOT_STICKY;
+        //return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
