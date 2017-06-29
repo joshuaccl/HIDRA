@@ -23,7 +23,7 @@ public class BluetoothDiscoveryService extends Service {
      * This public static String can be used to register receivers, used primarily
      * for receiving JSON data outside of this service from this service.
      */
-    public  static final String RECEIVE_JSON = "com.bah.iotsap.services.RECEIVE_JSON";
+    public  static final String RECEIVE_JSON = "com.bah.iotsap.services.BluetoothDiscoveryService.RECEIVE_JSON";
     private static final String TAG = "BTDiscoveryService";
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -44,19 +44,15 @@ public class BluetoothDiscoveryService extends Service {
                            " RSSI: " + rssi + " Date: " + date);
 
                 // Send information in local broadcast using JSON format
-                JSONObject item = new JSONObject();
                 try {
-                    Log.i(TAG, "Creating JSONObject and sending through local Intent");
+                    JSONObject item = new JSONObject();
                     item.put("date", date);
-                    item.put("mac", deviceMAC);
+                    item.put("mac",  deviceMAC);
                     item.put("name", deviceName);
                     item.put("rssi", rssi);
-                    Intent deviceInfo = new Intent();
-                    deviceInfo.setAction(RECEIVE_JSON);
-                    deviceInfo.putExtra("json", item.toString());
+                    Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                     Log.i(TAG, item.toString());
-                    //LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
-                    sendBroadcast(deviceInfo);
+                    LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
                 } catch(JSONException e) {
                     Log.i(TAG, "onReceive(): Caught JSON Exception");
                 }
@@ -83,6 +79,14 @@ public class BluetoothDiscoveryService extends Service {
         registerReceiver(receiver, filter);
     }
 
+    /**
+     * Handle launching different activities depending on what permissions and
+     * capabilities we have.
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return START_NOT_STICKY constant to prevent service from restarting when closing app
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");

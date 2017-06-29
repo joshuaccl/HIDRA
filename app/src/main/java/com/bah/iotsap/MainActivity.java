@@ -51,7 +51,6 @@ public class MainActivity extends FragmentActivity {
         viewPager = (ViewPager) findViewById(R.id.fragment_pager);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(START_INDEX);
-        Log.i(TAG, "onCreate: Finished pagerAdapter / viewPager setup");
 
         /**
          * Request permission for fine location if it is not already granted
@@ -62,9 +61,7 @@ public class MainActivity extends FragmentActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
 
-        /**
-         * Start the ServiceManager service
-         */
+        // Service manager handles launching services that are able to run on device
         startService(new Intent(ServiceManager.START_INTENT_ACTION, null, this, ServiceManager.class));
     }
 

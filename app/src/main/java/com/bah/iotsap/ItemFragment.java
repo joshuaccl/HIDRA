@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,9 +109,8 @@ public class ItemFragment extends ListFragment {
         super.onResume();
         Log.i(TAG, "onResume()");
         if(action != null) {
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(action);
-            getActivity().registerReceiver(receiver, filter);
+            IntentFilter filter = new IntentFilter(action);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
             Log.i(TAG, "onResume(): Registering receiver for action " + action);
         }
     }
@@ -120,7 +120,7 @@ public class ItemFragment extends ListFragment {
         super.onPause();
         try {
             Log.i(TAG, "onPause(): unregister Receiver");
-            getActivity().unregisterReceiver(receiver);
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
         } catch(Exception e) {
             Log.i(TAG, "onPause(): Caught exception unregister receiver");
         }
