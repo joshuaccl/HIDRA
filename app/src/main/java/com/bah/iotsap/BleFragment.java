@@ -1,6 +1,7 @@
 package com.bah.iotsap;
 
 import android.app.Fragment;
+import android.bluetooth.BluetoothDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.os.Bundle;
@@ -19,7 +20,8 @@ public class BleFragment extends Fragment {
 
     //Declare variables
     private static final String TAG = "BleFragment";
-    private ArrayAdapter<String> adapter;
+    private ArrayAdapter<BluetoothDevice> adapter;
+    private ArrayList<BluetoothDevice> deviceArray;
     private ListView deviceList;
 
     @Override
@@ -31,12 +33,10 @@ public class BleFragment extends Fragment {
         //Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.ble_fragment, container, false);
 
-        String[] deviceArray = {"test 1", "test2"};
-
         //initialize device list
         deviceList = (ListView) view.findViewById(R.id.ble_device_list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        ArrayAdapter<BluetoothDevice> adapter = new ArrayAdapter<BluetoothDevice>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
                 deviceArray
