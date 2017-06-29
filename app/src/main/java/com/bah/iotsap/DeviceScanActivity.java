@@ -26,7 +26,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,14 +40,43 @@ public class DeviceScanActivity extends ListActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
+    private Calendar time;
+    private int mRssi;
+    private RTArray mRTArray;
 
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
 
+    private class RTArray{
+        private ArrayList<Integer> rssi;
+        private ArrayList<Date> timeStamp;
+        private int count;
+
+        RTArray() {
+            rssi = new ArrayList<Integer>();
+            timeStamp = new ArrayList<Date>();
+            count = 0;
+        }
+        private void add(int r, Date t) {
+            rssi.add(r);
+            timeStamp.add(t);
+            count++;
+        }
+
+        private Integer getRssi(int position) {
+            return rssi.get(position);
+        }
+        private String getTimeStamp(int position) {
+            return timeStamp.get(position).toString();
+        }
+
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mRTArray = new RTArray();
 
         //request for location permissions
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -97,7 +129,6 @@ public class DeviceScanActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_scan:
-                mLeDeviceListAdapter.clear();
                 scanLeDevice(true);
                 break;
             case R.id.menu_stop:
@@ -225,10 +256,12 @@ public class DeviceScanActivity extends ListActivity {
             ViewHolder viewHolder;
             // General ListView optimization code.
             if (view == null) {
-                view = mInflator.inflate(R.layout.listitem_device, null);
+                view = mInflator.inflate(R.layout.listitem_device , null );
                 viewHolder = new ViewHolder();
                 viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
                 viewHolder.deviceName = (TextView) view.findViewById(R.id.device_name);
+                viewHolder.rssi = (TextView) view.findViewById(R.id.rssi);
+                viewHolder.time = (TextView) view.findViewById(R.id.time);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
@@ -241,6 +274,8 @@ public class DeviceScanActivity extends ListActivity {
             else
                 viewHolder.deviceName.setText(R.string.unknown_device);
             viewHolder.deviceAddress.setText(device.getAddress());
+            viewHolder.rssi.setText(mRTArray.getRssi(i).toString());
+            viewHolder.time.setText(mRTArray.getTimeStamp(i));
 
             return view;
         }
@@ -251,6 +286,9 @@ public class DeviceScanActivity extends ListActivity {
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
                     super.onScanResult(callbackType, result);
+                    time = Calendar.getInstance();
+                    mRssi = result.getRssi();
+                    mRTArray.add(mRssi, time.getTime());
                     mLeDeviceListAdapter.addDevice(result.getDevice());
                     mLeDeviceListAdapter.notifyDataSetChanged();
 
@@ -260,6 +298,9 @@ public class DeviceScanActivity extends ListActivity {
                 public void onBatchScanResults(List<ScanResult> results) {
                     super.onBatchScanResults(results);
                     for(ScanResult result : results) {
+                        time = Calendar.getInstance();
+                        mRssi = result.getRssi();
+                        mRTArray.add(mRssi, time.getTime());
                         mLeDeviceListAdapter.addDevice(result.getDevice());
                         mLeDeviceListAdapter.notifyDataSetChanged();
                     }
@@ -275,5 +316,7 @@ public class DeviceScanActivity extends ListActivity {
     static class ViewHolder {
         TextView deviceName;
         TextView deviceAddress;
+        TextView rssi;
+        TextView time;
     }
 }
