@@ -33,7 +33,6 @@ public class Main2Activity extends AppCompatActivity {
             //Finish making this button
             //Button nfc_start = (Button)
         });
-
         //making Back Button
         Button back_btn = (Button) findViewById(R.id.backb_readpage);
         back_btn.setOnClickListener(new View.OnClickListener() {
@@ -46,6 +45,8 @@ public class Main2Activity extends AppCompatActivity {
         //read the android doc
         //NdefMessage message;
         //message.
+
+        //Getting the NFC adapter
         //NfcAdapter myNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         //myNfcAdapter.setNdefPushMessage(message, this);
         /*mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
