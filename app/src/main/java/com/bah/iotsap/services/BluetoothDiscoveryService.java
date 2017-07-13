@@ -24,7 +24,9 @@ public class BluetoothDiscoveryService extends Service {
      * for receiving JSON data outside of this service from this service.
      */
     public  static final String RECEIVE_JSON = "com.bah.iotsap.services.BluetoothDiscoveryService.RECEIVE_JSON";
-    private static final String TAG = "BTDiscoveryService";
+    public  static final String START = "com.bah.iotsap.services.BluetoothDiscoveryService.START";
+    public  static final String STOP  = "com.bah.iotsap.services.BluetoothDiscoveryService.STOP";
+    private static final String TAG   = "BTDiscoveryService";
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -37,21 +39,20 @@ public class BluetoothDiscoveryService extends Service {
                 // Get information from discovered devices
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 String deviceName = device.getName();
-                String deviceMAC  = device.getAddress();
+                String deviceMac  = device.getAddress();
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                Log.i(TAG, "receiver: " + " name: " + deviceName + " MAC: " + deviceMAC +
-                           " RSSI: " + rssi + " Date: " + date);
 
                 // Send information in local broadcast using JSON format
                 try {
                     JSONObject item = new JSONObject();
                     item.put("date", date);
-                    item.put("mac",  deviceMAC);
+                    item.put("mac",  deviceMac);
                     item.put("name", deviceName);
                     item.put("rssi", rssi);
-                    Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                     Log.i(TAG, item.toString());
+
+                    Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                     LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
                 } catch(JSONException e) {
                     Log.i(TAG, "onReceive(): Caught JSON Exception");
@@ -63,10 +64,6 @@ public class BluetoothDiscoveryService extends Service {
             }
         }
     };
-
-    public BluetoothDiscoveryService() {
-        Log.i(TAG, "Constructor");
-    }
 
     @Override
     public void onCreate() {
@@ -104,7 +101,6 @@ public class BluetoothDiscoveryService extends Service {
 
         // This prevents the service from restarting after it is killed
         return START_NOT_STICKY;
-        //return super.onStartCommand(intent, flags, startId);
     }
 
     @Override

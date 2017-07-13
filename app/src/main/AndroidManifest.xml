@@ -55,6 +55,14 @@
         <service
             android:name=".services.ServiceManager"
             android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".services.BleDiscoveryService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".services.HTTPService"
+            android:enabled="true"
             android:exported="false"></service>
     </application>
 

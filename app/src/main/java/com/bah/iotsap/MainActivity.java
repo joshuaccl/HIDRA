@@ -62,12 +62,13 @@ public class MainActivity extends FragmentActivity {
         }
 
         // Service manager handles launching services that are able to run on device
-        startService(new Intent(ServiceManager.START_INTENT_ACTION, null, this, ServiceManager.class));
+        startService(new Intent(ServiceManager.START, null, this, ServiceManager.class));
     }
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(ServiceManager.STOP_INTENT_ACTION, null, this, ServiceManager.class));
+        Log.i(TAG, "onDestroy(): stopping ServiceManager");
+        stopService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
         super.onDestroy();
     }
 
