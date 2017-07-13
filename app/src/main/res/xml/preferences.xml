@@ -17,13 +17,13 @@
         android:defaultValue="true"/>
     <!-- BLE background service discovery -->
     <CheckBoxPreference
-        android:key="settings_ble"
+        android:key="settings_ble_service"
         android:title="@string/settings_ble_service"
         android:summary="@string/settings_ble_service_summ"
         android:defaultValue="true"/>
     <!-- NFC background service discovery -->
     <CheckBoxPreference
-        android:key="settings_nfc"
+        android:key="settings_nfc_service"
         android:title="@string/settings_nfc_service"
         android:summary="@string/settings_nfc_service_summ"
         android:defaultValue="true"/>

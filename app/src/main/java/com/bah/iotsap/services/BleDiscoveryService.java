@@ -7,6 +7,7 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -25,19 +26,38 @@ public class BleDiscoveryService extends Service {
     public  static final String STOP  = "com.bah.iotsap.services.BleDiscoveryService.STOP";
     private static final String TAG   = "BleDiscoveryService";
 
-    private final BluetoothAdapter bleAdapter = BluetoothAdapter.getDefaultAdapter();
-    private final BluetoothLeScanner leScanner = bleAdapter.getBluetoothLeScanner();
+    private BluetoothAdapter bleAdapter;
+    private BluetoothLeScanner leScanner;
+    private Handler handler;
+    private boolean scanning;
+    private static final long SCAN_PERIOD = 10000;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
+        bleAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bleAdapter == null) stopSelf();
+        else leScanner = bleAdapter.getBluetoothLeScanner();
+        handler = new Handler();
+        scanning = false;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
+        if(START.equals(intent.getAction())) {
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scanLeDevice(true);
+                }
+            }, SCAN_PERIOD);
+
+        } else if(STOP.equals(intent.getAction())) {
+
+        }
         return START_NOT_STICKY;
     }
 
@@ -45,6 +65,24 @@ public class BleDiscoveryService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy()");
+    }
+
+    private void scanLeDevice(final boolean enable) {
+        if(enable) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scanning = false;
+                    leScanner.stopScan(leScanCallback);
+                }
+            }, SCAN_PERIOD);
+
+            scanning = true;
+            leScanner.startScan(leScanCallback);
+        } else {
+            scanning = false;
+            leScanner.stopScan(leScanCallback);
+        }
     }
 
     private ScanCallback leScanCallback = new ScanCallback() {

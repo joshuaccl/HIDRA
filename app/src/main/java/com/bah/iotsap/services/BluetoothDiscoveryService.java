@@ -87,17 +87,22 @@ public class BluetoothDiscoveryService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-        // Check only continue if device supports Bluetooth
-        if(btAdapter == null) {
-            Log.i(TAG, "onStartCommand(): Device does not support BT, calling stopSelf()");
-            stopSelf();
-        } else if(!btAdapter.isEnabled()) {
-            Log.i(TAG, "onStartCommand(): enabling bluetooth adapter");
-            btAdapter.enable();
-        }
 
-        Log.i(TAG, "onStartCommand(): Discovering devices");
-        btAdapter.startDiscovery();
+        if(START.equals(intent.getAction())) {
+            if(btAdapter == null) {
+                Log.i(TAG, "onStartCommand(): Device does not support BT, calling stopSelf()");
+                stopSelf();
+            } else if(!btAdapter.isEnabled()) {
+                Log.i(TAG, "onStartCommand(): enabling bluetooth adapter");
+                btAdapter.enable();
+            }
+            Log.i(TAG, "onStartCommand(): Discovering devices");
+            btAdapter.startDiscovery();
+
+        } else if(STOP.equals(intent.getAction())) {
+            Log.i(TAG, "onStartCommand(): STOP ACTION");
+            stopSelf();
+        }
 
         // This prevents the service from restarting after it is killed
         return START_NOT_STICKY;
@@ -105,9 +110,8 @@ public class BluetoothDiscoveryService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "onDestroy(): Entered");
         super.onDestroy();
-        Log.i(TAG, "onDestroy(): Unregistering receiver");
+        Log.i(TAG, "onDestroy()");
         unregisterReceiver(receiver);
     }
 

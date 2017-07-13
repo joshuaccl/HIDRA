@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
 import com.bah.iotsap.services.ServiceManager;
 
@@ -98,7 +99,8 @@ public class MainActivity extends FragmentActivity {
                 case MAP_INDEX : registeredFragments.put(position, new MapFragment());      break;
                 case BT_INDEX  : registeredFragments.put(position, ItemFragment.newInstance(
                                     BluetoothDiscoveryService.RECEIVE_JSON)); break;
-                case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance()); break;
+                case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
+                                    BleDiscoveryService.RECEIVE_JSON)); break;
                 case NFC_INDEX : registeredFragments.put(position, ItemFragment.newInstance()); break;
                 default: break;
             }
