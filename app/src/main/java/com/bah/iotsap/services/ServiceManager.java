@@ -81,12 +81,14 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
             // Start Bluetooth service if applicable
             if(preferences.getBoolean(SettingsFragment.PREF_BT_SERVICE, false) &&
                     !isServiceRunning(BluetoothDiscoveryService.class)) {
+                Log.i(TAG, "onStartCommand(): Starting Bluetooth Service");
                 startService(new Intent(BluetoothDiscoveryService.START, null,
                         getApplicationContext(), BluetoothDiscoveryService.class));
             }
             // Start BLE service if applicable
             if(preferences.getBoolean(SettingsFragment.PREF_BLE_SERVICE, false) &&
                     !isServiceRunning(BleDiscoveryService.class)) {
+                Log.i(TAG, "onStartCommand(): Starting BLE Service");
                 startService(new Intent(BleDiscoveryService.START, null,
                         getApplicationContext(), BleDiscoveryService.class));
             }
@@ -95,11 +97,14 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
             Log.i(TAG, "onStartCommand(): intent action = STOP");
 
             if(isServiceRunning(BluetoothDiscoveryService.class)) {
+                Log.i(TAG, "onStartCommand(): Stopping Bluetooth Service");
                 stopService(new Intent(getApplicationContext(), BluetoothDiscoveryService.class));
             }
             if(isServiceRunning(BleDiscoveryService.class)) {
+                Log.i(TAG, "onStartCommand(): Stopping BLE Service");
                 stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
             }
+            Log.i(TAG, "onStartCommand(): Stopping Self");
             stopSelf();
         }
         return START_NOT_STICKY;
@@ -128,9 +133,11 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         // BLUETOOTH SETTINGS
         if(SettingsFragment.PREF_BT_SERVICE.equals(key)) {
             if(sharedPreferences.getBoolean(key, false)) {
+                Log.i(TAG, "onStaredPreferenceChanged(): Starting Bluetooth Service");
                 startService(new Intent(BluetoothDiscoveryService.START, null,
                         getApplicationContext(), BluetoothDiscoveryService.class));
             } else {
+                Log.i(TAG, "onSharedPreferenceChanged(): Stopping Bluetooth Service");
                 stopService(new Intent(getApplicationContext(), BluetoothDiscoveryService.class));
             }
         }
@@ -138,9 +145,11 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         // BLE SETTINGS
         if(SettingsFragment.PREF_BLE_SERVICE.equals(key)) {
             if(sharedPreferences.getBoolean(key, false)) {
+                Log.i(TAG, "onSharedPreferenceChanged(): Starting BLE Service");
                 startService(new Intent(BleDiscoveryService.START, null,
                         getApplicationContext(), BleDiscoveryService.class));
             } else {
+                Log.i(TAG, "onSharedPreferenceChanged(): Stopping BLE Service");
                 stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
             }
         }
