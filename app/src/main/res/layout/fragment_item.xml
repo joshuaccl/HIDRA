@@ -2,12 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bah.iotsap.TaskFragment">
+    tools:context="com.bah.iotsap.ItemFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/task_fragment_default" />
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

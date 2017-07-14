@@ -13,7 +13,6 @@
     <string name="map_fragment_default">Hello from map fragment!</string>
     <string name="task_fragment_default">Hello from TASK fragment!!</string>
 
-
     <string name="title_devices">Bluetooth Low Energy Devices</string>
     <string name="ble_not_supported">Bluetooth Low Energy on this device is not supported!</string>
     <string name="error_bluetooth_not_supported">Bluetooth is not supported on this phone!</string>
@@ -32,4 +31,6 @@
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -40,15 +40,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DeviceScanActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        =======
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".DeviceControlActivity"/>
-        <service android:name=".BluetoothLeService" android:enabled="true"/>
+        <service
+            android:name=".services.BluetoothDiscoveryService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".services.ServiceManager"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".services.BleDiscoveryService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".services.HTTPService"
+            android:enabled="true"
+            android:exported="false"></service>
+
     </application>
 
 </manifest>
