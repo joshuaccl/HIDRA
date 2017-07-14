@@ -17,6 +17,15 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * BluetoothDiscoveryService periodically scans for any and all near-by bluetooth devices.
+ * When it finds a device, it sends an intent with all the data from the device as a JSON-string.
+ * The service first checks to make sure that it can operate successfully (has all required permissions)
+ * before entering its standard scanning loop.
+ * TODO: Optimize scheduling of Bluetooth scans
+ * TODO: Communicate with BLE service to coordinate scans
+ * TODO: Acquire locational data to include with each scanned device
+ */
 public class BluetoothDiscoveryService extends Service {
 
     /**
@@ -69,6 +78,10 @@ public class BluetoothDiscoveryService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate(): Entered");
+
+        // Ensure service can operate successfully
+
+
         // Bluetooth discovery setup
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -113,6 +126,9 @@ public class BluetoothDiscoveryService extends Service {
         super.onDestroy();
         Log.i(TAG, "onDestroy()");
         unregisterReceiver(receiver);
+    }
+
+    private boolean hasPermissions() {
     }
 
     @Override

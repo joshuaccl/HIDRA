@@ -4,7 +4,7 @@ The Internet of Things Situational Awareness Platform
 
 ## End Goal
 
-To have a platform that runs on off-the-shelf devices like android smart phones that acts as a complementary data collection and dissemination system for existing systems.
+To develop a platform that runs on off-the-shelf devices such as android smart phones that acts as a complementary data collection and dissemination system for existing systems.
 
 ## TODO
 
