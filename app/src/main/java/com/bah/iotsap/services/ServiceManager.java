@@ -1,6 +1,5 @@
 package com.bah.iotsap.services;
 
-import android.Manifest;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -9,16 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.bah.iotsap.SettingsFragment;
 
+/**
+ * ServiceManager is responsible for launching other services initially.
+ * ServiceManager will launch all possible services it is allowed to by referencing the sharedPreferences
+ * for the application as well as checking if the service is currently running.
+ * We assume that each service checks if it has all the resources / adapters it needs to run internally.
+ */
 public class ServiceManager extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG   = "ServiceManager";
@@ -26,13 +28,6 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
     public  static final String STOP  = "com.bah.iotsap.services.ServiceManager.STOP";
 
     private SharedPreferences preferences;
-
-    // Booleans indicating which services are running
-    private boolean btDiscEnabled  = false;
-    private boolean bleDiscEnabled = false;
-    // Booleans indicating which permissions are enabled
-    private boolean btAdapterEnabled    = false;
-    private boolean fineLocationEnabled = false;
 
     /**
      * Receiver to listen for changes to the state of permissions.
@@ -71,12 +66,11 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
 
-        // Set up default values used to determine which services can be launched at time of check
-        btAdapterEnabled = BluetoothAdapter.getDefaultAdapter().isEnabled();
-        fineLocationEnabled = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Handle launching services initially here
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
@@ -84,21 +78,29 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         if(intent != null && START.equals(intent.getAction())) {
             Log.i(TAG, "onStartCommand(): intent action = START");
 
-            if (btAdapterEnabled && !btDiscEnabled) {
-                Log.i(TAG, "onStartCommand(): bt adapter enabled, starting btDiscService");
-                btDiscEnabled = true;
-                Intent bleIntent = new Intent(getApplicationContext(), BleDiscoveryService.class);
-                bleIntent.setAction(BleDiscoveryService.START);
-                startService(bleIntent);
+            // Start Bluetooth service if applicable
+            if(preferences.getBoolean(SettingsFragment.PREF_BT_SERVICE, false) &&
+                    !isServiceRunning(BluetoothDiscoveryService.class)) {
+                startService(new Intent(BluetoothDiscoveryService.START, null,
+                        getApplicationContext(), BluetoothDiscoveryService.class));
+            }
+            // Start BLE service if applicable
+            if(preferences.getBoolean(SettingsFragment.PREF_BLE_SERVICE, false) &&
+                    !isServiceRunning(BleDiscoveryService.class)) {
+                startService(new Intent(BleDiscoveryService.START, null,
+                        getApplicationContext(), BleDiscoveryService.class));
             }
 
         } else if(intent != null && intent.getAction().equals(STOP)) {
             Log.i(TAG, "onStartCommand(): intent action = STOP");
 
-            if(isServiceRunning(BluetoothDiscoveryService.class))
+            if(isServiceRunning(BluetoothDiscoveryService.class)) {
                 stopService(new Intent(getApplicationContext(), BluetoothDiscoveryService.class));
-            if(isServiceRunning(BleDiscoveryService.class))
+            }
+            if(isServiceRunning(BleDiscoveryService.class)) {
                 stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
+            }
+            stopSelf();
         }
         return START_NOT_STICKY;
     }
@@ -115,24 +117,32 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         }
     }
 
+    /**
+     * If any preferences change for the application, we need to decide if any services need to
+     * be started or stopped.
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.i(TAG, "onSharedPreferenceChanged(): key = " + key);
-        if(key.equals(SettingsFragment.PREF_BT_SERVICE)) {
-            Log.i(TAG, "onSharedPreferenceChanged(): ENTERING PREF_BT_SERVICE");
-            boolean btValue  = sharedPreferences.getBoolean(key, false);
-            Log.i(TAG, "onSharedPreferenceChanged(): btValue = " + btValue);
-            if(btValue) {
-                btDiscEnabled = true;
-                startService(new Intent(BluetoothDiscoveryService.START,
-                        null, getApplicationContext(), BluetoothDiscoveryService.class));
+
+        // BLUETOOTH SETTINGS
+        if(SettingsFragment.PREF_BT_SERVICE.equals(key)) {
+            if(sharedPreferences.getBoolean(key, false)) {
+                startService(new Intent(BluetoothDiscoveryService.START, null,
+                        getApplicationContext(), BluetoothDiscoveryService.class));
             } else {
                 stopService(new Intent(getApplicationContext(), BluetoothDiscoveryService.class));
             }
-        } else if(key.equals(SettingsFragment.PREF_BLE_SERVICE)) {
-            boolean bleValue = sharedPreferences.getBoolean(key, false);
-        } else if(key.equals(SettingsFragment.PREF_NFC_SERVICE)) {
-            boolean nfcValue = sharedPreferences.getBoolean(key, false);
+        }
+
+        // BLE SETTINGS
+        if(SettingsFragment.PREF_BLE_SERVICE.equals(key)) {
+            if(sharedPreferences.getBoolean(key, false)) {
+                startService(new Intent(BleDiscoveryService.START, null,
+                        getApplicationContext(), BleDiscoveryService.class));
+            } else {
+                stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
+            }
         }
     }
 
