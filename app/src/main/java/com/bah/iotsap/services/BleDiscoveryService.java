@@ -19,6 +19,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * This class periodically scans for BLE devices. When it finds a device, it sends a JSON string
+ * containing information about the device in an intent broadcast that anyone can receive by
+ * registering a receiver for the "RECEIVE_JSON" action.
+ * This service will only operate if it has determined nothing should impede it.
+ * TODO: Optimize scheduling of scans
+ * TODO: Communicate with Bluetooth service when both are running to coordinate scans
+ * TODO: Acquire locational data to send with each device intent
+ * TODO: Write a function to check if app has all permissions required to run service
+ */
 public class BleDiscoveryService extends Service {
 
     public  static final String RECEIVE_JSON = "com.bah.iotsap.services.BleDiscoveryService.RECEIVE_JSON";
@@ -51,6 +61,7 @@ public class BleDiscoveryService extends Service {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i(TAG, "inner Runnable: run(): about to scan LE devices");
                     scanLeDevice(true);
                 }
             }, SCAN_PERIOD);
@@ -72,14 +83,17 @@ public class BleDiscoveryService extends Service {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i(TAG, "scanLeDevice(): Runnable: run(): stopping scan");
                     scanning = false;
                     leScanner.stopScan(leScanCallback);
                 }
             }, SCAN_PERIOD);
 
+            Log.i(TAG, "scanLeDevice(): starting scan");
             scanning = true;
             leScanner.startScan(leScanCallback);
         } else {
+            Log.i(TAG, "scanLeDevice(): stopping scan");
             scanning = false;
             leScanner.stopScan(leScanCallback);
         }

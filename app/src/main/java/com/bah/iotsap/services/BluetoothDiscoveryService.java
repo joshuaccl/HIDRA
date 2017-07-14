@@ -1,5 +1,6 @@
 package com.bah.iotsap.services;
 
+import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,7 +8,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -80,7 +83,10 @@ public class BluetoothDiscoveryService extends Service {
         Log.i(TAG, "onCreate(): Entered");
 
         // Ensure service can operate successfully
-
+        if(!hasPermissions()) {
+            Log.i(TAG, "onCreate(): does not have all permissions, stopping self");
+            stopSelf();
+        }
 
         // Bluetooth discovery setup
         IntentFilter filter = new IntentFilter();
@@ -102,10 +108,7 @@ public class BluetoothDiscoveryService extends Service {
         Log.i(TAG, "onStartCommand()");
 
         if(START.equals(intent.getAction())) {
-            if(btAdapter == null) {
-                Log.i(TAG, "onStartCommand(): Device does not support BT, calling stopSelf()");
-                stopSelf();
-            } else if(!btAdapter.isEnabled()) {
+            if(!btAdapter.isEnabled()) {
                 Log.i(TAG, "onStartCommand(): enabling bluetooth adapter");
                 btAdapter.enable();
             }
@@ -128,7 +131,21 @@ public class BluetoothDiscoveryService extends Service {
         unregisterReceiver(receiver);
     }
 
+    /**
+     * Confirm that service has all permissions required to operate
+     * @return true if service should be able to reun without any issues
+     */
     private boolean hasPermissions() {
+        Log.i(TAG, "hasPermissions()");
+        int fineLocationCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(fineLocationCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "hasPermissions(): no FINE LOCATION");
+            return false;
+        } else if(btAdapter == null) {
+            Log.i(TAG, "hasPermissions(): no BT ADAPTER");
+            return false;
+        } else return true;
     }
 
     @Override
