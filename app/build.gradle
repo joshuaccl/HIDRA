@@ -19,11 +19,18 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar') {
+        transitive=true
+    }
     compile 'com.google.android.gms:play-services:11.0.2'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:support-v13:25.3.1'
