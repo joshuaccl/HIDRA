@@ -17,6 +17,7 @@ import android.util.SparseArray;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
 import com.bah.iotsap.services.ServiceManager;
+import com.mapbox.mapboxsdk.maps.MapFragment;
 
 /**
  * This activity is basically a container for various fragments. It consists
@@ -95,8 +96,8 @@ public class MainActivity extends FragmentActivity {
         public Fragment getItem(int position) {
             Log.i(TAG, "PagerAdapter: getItem, position = " + position);
             switch(position) {
-                case PREF_INDEX: registeredFragments.put(position, new SettingsFragment()); break;
-                case MAP_INDEX : registeredFragments.put(position, new MapFragment());      break;
+                case PREF_INDEX: registeredFragments.put(position, new SettingsFragment());    break;
+                case MAP_INDEX : registeredFragments.put(position, MapFragment.newInstance()); break;
                 case BT_INDEX  : registeredFragments.put(position, ItemFragment.newInstance(
                         BluetoothDiscoveryService.RECEIVE_JSON)); break;
                 case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
