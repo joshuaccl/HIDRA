@@ -5,6 +5,11 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+/**
+ * HTTPService allows us to send information over HTTP.
+ * You are able to send files or text over HTTP via POST or form/multipart.
+ * TODO: Implement EVERYTHING
+ */
 public class HTTPService extends Service {
 
     private static final String TAG  = "HTTPService";

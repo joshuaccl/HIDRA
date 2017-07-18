@@ -13,17 +13,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ItemFragment is a simple fragment that receives messages / data from any intent that it is
+ * passed on instantiation.
+ * Example: ItemFragment.getInstance(BleDiscoveryService.RECEIVE_JSON)
+ * Result : This fragment receives all intents sent from the service with the RECEIVE_JSON action.
+ */
 public class ItemFragment extends ListFragment {
 
     private static final String TAG = "ItemFragment";
 
     private String               action;
-    private ListView             listView;
     private ArrayAdapter<String> adapter;
     private List<String>         list;
 
@@ -93,7 +97,6 @@ public class ItemFragment extends ListFragment {
         // Set up adapter with the ListView
         if(list == null) list = new ArrayList<>();
         adapter = new ArrayAdapter<>(view.getContext(), R.layout.list_item, list);
-        listView = getListView();
         setListAdapter(adapter);
 
         // Check the bundle for saved information or Strings
