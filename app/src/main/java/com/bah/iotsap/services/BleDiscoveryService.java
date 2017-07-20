@@ -1,5 +1,6 @@
 package com.bah.iotsap.services;
 
+import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,8 +8,10 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -31,26 +34,35 @@ import java.util.List;
  */
 public class BleDiscoveryService extends Service {
 
-    public  static final String RECEIVE_JSON = "com.bah.iotsap.services.BleDiscoveryService.RECEIVE_JSON";
-    public  static final String START = "com.bah.iotsap.services.BleDiscoveryService.START";
-    public  static final String STOP  = "com.bah.iotsap.services.BleDiscoveryService.STOP";
-    private static final String TAG   = "BleDiscoveryService";
+    private static final String TAG = "BleDiscoveryService";
+    // Intent Action Strings
+    public static final String RECEIVE_JSON = "com.bah.iotsap.services.BleDiscoveryService.RECEIVE_JSON";
+    public static final String START = "com.bah.iotsap.services.BleDiscoveryService.START";
+    public static final String STOP  = "com.bah.iotsap.services.BleDiscoveryService.STOP";
+    // Preference strings
+    public static final String PREF_BLE_SERVICE  = "pref_ble_service";
+    public static final String PREF_BLE_SCANTIME = "pref_ble_scantime";
+    public static final String PREF_BLE_DELAY    = "pref_ble_delay";
 
-    private BluetoothAdapter bleAdapter;
+
+    private BluetoothAdapter bleAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothLeScanner leScanner;
     private Handler handler;
-    private boolean scanning;
-    private static final long SCAN_PERIOD = 10000;
+    private boolean scanning = false;
+    private long scantime = 10000;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
-        bleAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bleAdapter == null) stopSelf();
-        else leScanner = bleAdapter.getBluetoothLeScanner();
+
+        // Ensure operation can run successfully
+        if(!hasPermissions()) {
+            Log.i(TAG, "onCreate(): Do not have all permissions required to run. Stopping self");
+            stopSelf();
+        }
+        leScanner = bleAdapter.getBluetoothLeScanner();
         handler = new Handler();
-        scanning = false;
     }
 
     @Override
@@ -64,7 +76,7 @@ public class BleDiscoveryService extends Service {
                     Log.i(TAG, "inner Runnable: run(): about to scan LE devices");
                     scanLeDevice(true);
                 }
-            }, SCAN_PERIOD);
+            }, scantime);
 
         } else if(STOP.equals(intent.getAction())) {
 
@@ -78,6 +90,19 @@ public class BleDiscoveryService extends Service {
         Log.i(TAG, "onDestroy()");
     }
 
+    private boolean hasPermissions() {
+        Log.i(TAG, "hasPermissions()");
+        int fineLocationCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(fineLocationCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "hasPermissions(): no FINE LOCATION");
+            return false;
+        } else if(bleAdapter == null) {
+            Log.i(TAG, "hasPermissions(): no BT ADAPTER");
+            return false;
+        } else return true;
+    }
+
     private void scanLeDevice(final boolean enable) {
         if(enable) {
             handler.postDelayed(new Runnable() {
@@ -87,7 +112,7 @@ public class BleDiscoveryService extends Service {
                     scanning = false;
                     leScanner.stopScan(leScanCallback);
                 }
-            }, SCAN_PERIOD);
+            }, scantime);
 
             Log.i(TAG, "scanLeDevice(): starting scan");
             scanning = true;

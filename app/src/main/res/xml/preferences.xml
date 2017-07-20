@@ -5,26 +5,27 @@
     This file represents the settings that populate the
     settings fragment in the MainActivity. Each CheckBoxPreference
     is a new settings menu field.
+    The keys MUST match the public static final preference strings found in each service.
 
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Bluetooth background service discovery -->
     <CheckBoxPreference
-        android:key="settings_bluetooth_service"
-        android:title="@string/settings_bluetooth_service"
-        android:summary="@string/settings_bluetooth_service_summ"
+        android:key="pref_bt_service"
+        android:title="@string/pref_text_bluetooth_service"
+        android:summary="@string/pref_text_bluetooth_service_summ"
         android:defaultValue="true"/>
     <!-- BLE background service discovery -->
     <CheckBoxPreference
-        android:key="settings_ble_service"
-        android:title="@string/settings_ble_service"
-        android:summary="@string/settings_ble_service_summ"
+        android:key="pref_ble_service"
+        android:title="@string/pref_text_ble_service"
+        android:summary="@string/pref_text_ble_service_summ"
         android:defaultValue="true"/>
     <!-- NFC background service discovery -->
     <CheckBoxPreference
-        android:key="settings_nfc_service"
-        android:title="@string/settings_nfc_service"
-        android:summary="@string/settings_nfc_service_summ"
+        android:key="pref_nfc_service"
+        android:title="@string/pref_text_nfc_service"
+        android:summary="@string/pref_text_nfc_service_summ"
         android:defaultValue="true"/>
 </PreferenceScreen>

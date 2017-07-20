@@ -13,8 +13,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.bah.iotsap.SettingsFragment;
-
 /**
  * ServiceManager is responsible for launching other services initially.
  * ServiceManager will launch all possible services it is allowed to by referencing the sharedPreferences
@@ -23,9 +21,10 @@ import com.bah.iotsap.SettingsFragment;
  */
 public class ServiceManager extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private static final String TAG   = "ServiceManager";
-    public  static final String START = "com.bah.iotsap.services.ServiceManager.START";
-    public  static final String STOP  = "com.bah.iotsap.services.ServiceManager.STOP";
+    private static final String TAG = "ServiceManager";
+    // intent action strings
+    public static final String START = "com.bah.iotsap.services.ServiceManager.START";
+    public static final String STOP  = "com.bah.iotsap.services.ServiceManager.STOP";
 
     private SharedPreferences preferences;
 
@@ -69,7 +68,9 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
     }
 
     /**
-     * Handle launching services initially here
+     * Launch all possible services that can run on hardware and that are allowed in Preferences.
+     * We handle launching and stopping them here, however each service first checks to ensure that
+     * it can run without encountering errors.
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -79,22 +80,19 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
             Log.i(TAG, "onStartCommand(): intent action = START");
 
             // Start Bluetooth service if applicable
-            if(preferences.getBoolean(SettingsFragment.PREF_BT_SERVICE, false) &&
+            if(preferences.getBoolean(BluetoothDiscoveryService.PREF_BT_SERVICE, false) &&
                     !isServiceRunning(BluetoothDiscoveryService.class)) {
                 Log.i(TAG, "onStartCommand(): Starting Bluetooth Service");
                 startService(new Intent(BluetoothDiscoveryService.START, null,
                         getApplicationContext(), BluetoothDiscoveryService.class));
             }
             // Start BLE service if applicable
-            if(preferences.getBoolean(SettingsFragment.PREF_BLE_SERVICE, false) &&
+            if(preferences.getBoolean(BleDiscoveryService.PREF_BLE_SERVICE, false) &&
                     !isServiceRunning(BleDiscoveryService.class)) {
                 Log.i(TAG, "onStartCommand(): Starting BLE Service");
                 startService(new Intent(BleDiscoveryService.START, null,
                         getApplicationContext(), BleDiscoveryService.class));
             }
-
-            // TODO: REMOVE THIS LINE BELOW
-            startService(new Intent(this, HttpService.class).setAction(HttpService.SEND_FILE));
 
         } else if(intent != null && intent.getAction().equals(STOP)) {
             Log.i(TAG, "onStartCommand(): intent action = STOP");
@@ -134,7 +132,7 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         Log.i(TAG, "onSharedPreferenceChanged(): key = " + key);
 
         // BLUETOOTH SETTINGS
-        if(SettingsFragment.PREF_BT_SERVICE.equals(key)) {
+        if(BluetoothDiscoveryService.PREF_BT_SERVICE.equals(key)) {
             if(sharedPreferences.getBoolean(key, false)) {
                 Log.i(TAG, "onStaredPreferenceChanged(): Starting Bluetooth Service");
                 startService(new Intent(BluetoothDiscoveryService.START, null,
@@ -146,7 +144,7 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         }
 
         // BLE SETTINGS
-        if(SettingsFragment.PREF_BLE_SERVICE.equals(key)) {
+        if(BleDiscoveryService.PREF_BLE_SERVICE.equals(key)) {
             if(sharedPreferences.getBoolean(key, false)) {
                 Log.i(TAG, "onSharedPreferenceChanged(): Starting BLE Service");
                 startService(new Intent(BleDiscoveryService.START, null,

@@ -4,31 +4,12 @@
     <!-- Mapbox strings -->
     <string name="mapbox_token">pk.eyJ1Ijoic2FyYWJhaCIsImEiOiJjajN1aW5zMzkwMTZwMnhueDJydnp2YmQ4In0.-SlPyNG0SB7viKcqy5c9KQ</string>
 
-    <!-- Settings strings -->
-    <string name="settings_bluetooth_service">Bluetooth background search service</string>
-    <string name="settings_bluetooth_service_summ">Enable bluetooth search polling</string>
-    <string name="settings_ble_service">Bluetooth Low Energy background search service</string>
-    <string name="settings_ble_service_summ">Enable BLE search polling</string>
-    <string name="settings_nfc_service">NFC background service</string>
-    <string name="settings_nfc_service_summ">Enable NFC background response</string>
-
-
-    <string name="title_devices">Bluetooth Low Energy Devices</string>
-    <string name="ble_not_supported">Bluetooth Low Energy on this device is not supported!</string>
-    <string name="error_bluetooth_not_supported">Bluetooth is not supported on this phone!</string>
-    <string name="unknown_device">Unknown Device</string>
-    <string name="unknown_service">Unknown Service</string>
-    <string name="unknown_characteristic">Unknown Characteristics</string>
-    <string name="no_data">No Data</string>
-    <string name="label_data">Data:</string>
-    <string name="label_state">State:</string>
-    <string name="label_device_address">Device Address:</string>
-
-    <string name="menu_scan">Scan</string>
-    <string name="menu_stop">Stop</string>
-    <string name="menu_connect">Connect</string>
-    <string name="menu_disconnect">Disconnect</string>
-    <string name="connected">Connected</string>
-    <string name="disconnected">Disconnected</string>
+    <!-- Preferences TEXT strings (NOT KEYS) -->
+    <string name="pref_text_bluetooth_service">Bluetooth background search service</string>
+    <string name="pref_text_bluetooth_service_summ">Enable bluetooth search polling</string>
+    <string name="pref_text_ble_service">Bluetooth Low Energy background search service</string>
+    <string name="pref_text_ble_service_summ">Enable BLE search polling</string>
+    <string name="pref_text_nfc_service">NFC background service</string>
+    <string name="pref_text_nfc_service_summ">Enable NFC background response</string>
 
 </resources>
