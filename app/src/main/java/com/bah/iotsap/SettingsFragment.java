@@ -4,9 +4,14 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+/**
+ * SettingsFragment is what is used to change any sharedPreference for the entire app.
+ * It allows users to change persistent settings. The settings are defined in preferences.xml.
+ */
 public class SettingsFragment extends PreferenceFragment {
 
     private static final String TAG = "SettingsFragment";
+    // Strings representing the possible setting options.
     public  static final String PREF_BT_SERVICE  = "settings_bluetooth_service";
     public  static final String PREF_BLE_SERVICE = "settings_ble_service";
     public  static final String PREF_NFC_SERVICE = "settings_nfc_service";

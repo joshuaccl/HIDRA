@@ -64,7 +64,7 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.i(TAG, "onSaveINstanceState()");
+        Log.i(TAG, "onSaveInstanceState()");
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
