@@ -64,7 +64,7 @@
             android:enabled="true"
             android:exported="false" />
         <service
-            android:name=".services.HTTPService"
+            android:name=".services.HttpService"
             android:enabled="true"
             android:exported="false" />
 
