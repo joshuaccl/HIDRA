@@ -31,14 +31,15 @@ import java.util.Date;
  */
 public class BluetoothDiscoveryService extends Service {
 
-    /**
-     * This public static String can be used to register receivers, used primarily
-     * for receiving JSON data outside of this service from this service.
-     */
-    public  static final String RECEIVE_JSON = "com.bah.iotsap.services.BluetoothDiscoveryService.RECEIVE_JSON";
-    public  static final String START = "com.bah.iotsap.services.BluetoothDiscoveryService.START";
-    public  static final String STOP  = "com.bah.iotsap.services.BluetoothDiscoveryService.STOP";
-    private static final String TAG   = "BTDiscoveryService";
+    private static final String TAG = "BTDiscoveryService";
+    // Intent action strings
+    public static final String RECEIVE_JSON = "com.bah.iotsap.services.BluetoothDiscoveryService.RECEIVE_JSON";
+    public static final String START = "com.bah.iotsap.services.BluetoothDiscoveryService.START";
+    public static final String STOP  = "com.bah.iotsap.services.BluetoothDiscoveryService.STOP";
+    // SharedPreferences Strings
+    public static final String PREF_BT_SERVICE  = "pref_bt_service";
+    public static final String PREF_BT_SCANTIME = "pref_bt_scantime";
+    public static final String PREF_BT_DELAY    = "pref_bt_delay";
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
