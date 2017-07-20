@@ -93,6 +93,9 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
                         getApplicationContext(), BleDiscoveryService.class));
             }
 
+            // TODO: REMOVE THIS LINE BELOW
+            startService(new Intent(this, HttpService.class).setAction(HttpService.SEND_FILE));
+
         } else if(intent != null && intent.getAction().equals(STOP)) {
             Log.i(TAG, "onStartCommand(): intent action = STOP");
 
