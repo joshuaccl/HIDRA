@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,29 +17,34 @@ import java.io.OutputStream;
 
 /**
  * FileRW is used to read and write files to internal storage.
- *
+ * This class contains several useful methods for interacting with files.
+ * TODO: Create "write" method that erases file if it has anything in it and writes from scratch
+ * TODO: Write and read files to a folder so we do not interact with any system-created files
  */
 public final class FileRW {
 
     private static final String TAG = "FileRW";
     public  static final String FOLDER = "iotsap/";
 
-    //Make empty file with name fileName
+    // Make empty file with name fileName
     public static boolean init(Context context, String fileName) {
         try {
             FileOutputStream fileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            fileOutputStream.close();
             return true;
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch(IOException e) {
+            Log.i(TAG, "init(Context, String): Caught IOException");
+            return false;
+        } catch(Exception e) {
+            Log.i(TAG, "init(Context, String): Caught Exception");
             return false;
         }
     }
 
-    //Write new object to file with fileName
-    public static boolean write(Context context, String fileName, String contents) {
+    // Append contents to end of given file
+    public static boolean append(Context context, String fileName, String contents) {
         FileOutputStream fileOutputStream;
         String newLine = "\n";
-
         try{
             fileOutputStream = context.openFileOutput(fileName, Context.MODE_APPEND);
             fileOutputStream.write(contents.getBytes());
@@ -47,12 +53,11 @@ public final class FileRW {
             return true;
         } catch (Exception e) {
             Log.i(TAG, "write(Context, String, String): Caught Exception");
-            e.printStackTrace();
             return false;
         }
     }
 
-    //Read the file with fileName
+    // Read the file with fileName
     public static String read(Context context, String filename) {
         String line, contents = "";
         try{
