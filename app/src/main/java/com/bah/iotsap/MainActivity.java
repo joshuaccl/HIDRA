@@ -10,7 +10,6 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -37,7 +36,7 @@ public class MainActivity extends FragmentActivity {
     private static final int NFC_INDEX     = 4;
 
     PagerAdapter pagerAdapter;
-    ViewPager viewPager;
+    FragmentViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +50,11 @@ public class MainActivity extends FragmentActivity {
          */
         Log.i(TAG, "onCreate: Setting up pagerAdapter / viewPager");
         pagerAdapter = new PagerAdapter(getFragmentManager());
-        viewPager = (ViewPager) findViewById(R.id.fragment_pager);
+        viewPager = (FragmentViewPager) findViewById(R.id.fragment_pager);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(START_INDEX);
 
-        /**
-         * Request permission for fine location if it is not already granted
-         */
+        // Request permission for fine location if it is not already granted
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "onCreate(): Requesting FINE LOCATION permission");
@@ -122,8 +119,6 @@ public class MainActivity extends FragmentActivity {
         /**
          * Use to retrieve a fragment at a particular position.
          * Usage: MapFragment frag = (MapFragment) pagerAdapter.getFragmentAt(MAP_INDEX);
-         * @param position
-         * @return Fragment
          */
         @Nullable
         public Fragment getFragmentAt(int position) {
