@@ -9,11 +9,14 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.bah.iotsap.util.LocationDiscovery;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +52,7 @@ public class BleDiscoveryService extends Service {
     private boolean scanning;               // Tell if a scan is currently running
     private long scantime;                  // Time to actively scan for devices
     private long delay;                     // Time to wait after a scan before restarting
+    private LocationDiscovery mLocationDiscovery; //Location class for getting the location
 
     private final Runnable stopper = new Runnable() {
         @Override
@@ -65,7 +69,6 @@ public class BleDiscoveryService extends Service {
             scanLeDevice(scanning);
         }
     };
-
 
     @Override
     public void onCreate() {
@@ -84,6 +87,11 @@ public class BleDiscoveryService extends Service {
             Log.i(TAG, "onCreate(): Do not have all permissions required to run. Stopping self");
             stopSelf();
         }
+
+        mLocationDiscovery = new LocationDiscovery();
+        mLocationDiscovery.configureLocationClass(this);
+        mLocationDiscovery.startLocationUpdates();
+
         leScanner = bleAdapter.getBluetoothLeScanner();
     }
 
@@ -137,6 +145,7 @@ public class BleDiscoveryService extends Service {
             String deviceMac  = device.getAddress();
             int    rssi       = result.getRssi();
             String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            Location location = mLocationDiscovery.getLocation();
 
             try {
                 JSONObject item = new JSONObject();
@@ -144,6 +153,9 @@ public class BleDiscoveryService extends Service {
                 item.put("mac", deviceMac);
                 item.put("name", deviceName);
                 item.put("rssi", rssi);
+                item.put("latitude", location.getLatitude());
+                item.put("longitude", location.getLongitude());
+                item.put("altitude", location.getAltitude());
                 Log.i(TAG, "ScanCallback(): json = " + item.toString());
 
                 Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
@@ -164,6 +176,7 @@ public class BleDiscoveryService extends Service {
                 String deviceMac  = device.getAddress();
                 int    rssi       = result.getRssi();
                 String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                Location location = mLocationDiscovery.getLocation();
 
                 try {
                     JSONObject item = new JSONObject();
@@ -171,6 +184,9 @@ public class BleDiscoveryService extends Service {
                     item.put("mac", deviceMac);
                     item.put("name", deviceName);
                     item.put("rssi", rssi);
+                    item.put("latitude", location.getLatitude());
+                    item.put("longitude", location.getLongitude());
+                    item.put("altitude", location.getAltitude());
                     Log.i(TAG, "onBatchScanResults(): json = " + item.toString());
 
                     Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());

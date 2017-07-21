@@ -94,6 +94,13 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
                 startService(new Intent(BleDiscoveryService.START, null,
                         getApplicationContext(), BleDiscoveryService.class));
             }
+            //Start Beacon service if applicable
+            if(preferences.getBoolean(BeaconDiscoveryService.PREF_BEACON_SERVICE, false) &&
+                    !isServiceRunning(BeaconDiscoveryService.class)) {
+                Log.i(TAG, "onStartCommand(): Starting Beacon Service");
+                startService(new Intent(BeaconDiscoveryService.START, null,
+                        getApplicationContext(), BeaconDiscoveryService.class));
+            }
 
         } else if(intent != null && intent.getAction().equals(STOP)) {
             Log.i(TAG, "onStartCommand(): intent action = STOP");
@@ -105,6 +112,9 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
             if(isServiceRunning(BleDiscoveryService.class)) {
                 Log.i(TAG, "onStartCommand(): Stopping BLE Service");
                 stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
+            }
+            if(isServiceRunning(BeaconDiscoveryService.class)) {
+                stopService(new Intent(getApplicationContext(), BeaconDiscoveryService.class));
             }
             Log.i(TAG, "onStartCommand(): Stopping Self");
             stopSelf();
@@ -153,6 +163,16 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
             } else {
                 Log.i(TAG, "onSharedPreferenceChanged(): Stopping BLE Service");
                 stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
+            }
+        }
+
+        //Beacon Settings
+        if(BeaconDiscoveryService.PREF_BEACON_SERVICE.equals(key)) {
+            if(sharedPreferences.getBoolean(key, false)) {
+                startService(new Intent(BeaconDiscoveryService.START, null,
+                        getApplicationContext(), BeaconDiscoveryService.class));
+            } else {
+                stopService(new Intent(getApplicationContext(), BeaconDiscoveryService.class));
             }
         }
     }

@@ -9,10 +9,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.bah.iotsap.util.LocationDiscovery;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +44,8 @@ public class BluetoothDiscoveryService extends Service {
     public static final String PREF_BT_SCANTIME = "pref_bt_scantime";
     public static final String PREF_BT_DELAY    = "pref_bt_delay";
 
+    private LocationDiscovery mLocationDiscovery;
+
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -55,6 +60,7 @@ public class BluetoothDiscoveryService extends Service {
                 String deviceMac  = device.getAddress();
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                Location location = mLocationDiscovery.getLocation();
 
                 // Send information in local broadcast using JSON format
                 try {
@@ -63,6 +69,9 @@ public class BluetoothDiscoveryService extends Service {
                     item.put("mac",  deviceMac);
                     item.put("name", deviceName);
                     item.put("rssi", rssi);
+                    item.put("latitude", location.getLatitude());
+                    item.put("longitude", location.getLongitude());
+                    item.put("altitude", location.getAltitude());
                     Log.i(TAG, item.toString());
 
                     Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
@@ -88,6 +97,10 @@ public class BluetoothDiscoveryService extends Service {
             Log.i(TAG, "onCreate(): does not have all permissions, stopping self");
             stopSelf();
         }
+
+        mLocationDiscovery = new LocationDiscovery();
+        mLocationDiscovery.configureLocationClass(this);
+        mLocationDiscovery.startLocationUpdates();
 
         // Bluetooth discovery setup
         IntentFilter filter = new IntentFilter();

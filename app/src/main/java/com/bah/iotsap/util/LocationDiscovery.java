@@ -1,6 +1,7 @@
-package com.bah.iotsap;
+package com.bah.iotsap.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -29,7 +30,8 @@ public class LocationDiscovery {
     private static LocationCallback mLocationCallback;
     private static LocationRequest mLocationRequest;
     private static LocationRequest currentLocationRequest;
-    private Activity mActivity;
+//    private Activity mActivity;
+    private Context mContext;
     private static int count;
     private static int clickCount;
 
@@ -37,11 +39,11 @@ public class LocationDiscovery {
     public LocationDiscovery() {}
 
     //Call this method to first initialize location discovery
-    public void configureLocationClass(Activity activity) {
+    public void configureLocationClass(Context context) {
 
-        mActivity = activity;
+        mContext = context;
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
 
         createLocationRequest();
 
@@ -49,25 +51,25 @@ public class LocationDiscovery {
         clickCount = 0;
 
 
-        if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-        }
+//        if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+//        }
 
 
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(
-                mActivity, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if(location != null) {
-                            mLocation = location;
-                        }
-                        else {
-                            Toast.makeText(mActivity, "Last Known Location is Unknown", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            );
+//        mFusedLocationClient.getLastLocation().addOnSuccessListener(
+//                mActivity, new OnSuccessListener<Location>() {
+//                    @Override
+//                    public void onSuccess(Location location) {
+//                        if(location != null) {
+//                            mLocation = location;
+//                        }
+//                        else {
+//                            Toast.makeText(mActivity, "Last Known Location is Unknown", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }
+//            );
 
         mLocationCallback = new LocationCallback() {
             @Override

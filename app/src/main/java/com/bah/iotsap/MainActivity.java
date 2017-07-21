@@ -14,9 +14,11 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.bah.iotsap.services.BeaconDiscoveryService;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
 import com.bah.iotsap.services.ServiceManager;
+import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 
 /**
  * This activity is basically a container for various fragments. It consists
@@ -101,7 +103,8 @@ public class MainActivity extends FragmentActivity {
                         BluetoothDiscoveryService.RECEIVE_JSON)); break;
                 case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
                         BleDiscoveryService.RECEIVE_JSON)); break;
-                case NFC_INDEX : registeredFragments.put(position, ItemFragment.newInstance()); break;
+                case NFC_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
+                        BeaconDiscoveryService.RECEIVE_JSON)); break;
                 default: break;
             }
             return registeredFragments.get(position);
