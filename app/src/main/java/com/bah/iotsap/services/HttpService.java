@@ -3,17 +3,16 @@ package com.bah.iotsap.services;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.bah.iotsap.util.FileRW;
+
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -145,7 +144,7 @@ public class HttpService extends IntentService {
             writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.toString()).append(CRLF);
             writer.append(CRLF).flush();
             // copy all bytes of file to output stream
-            copyFile(file, conn.getOutputStream());
+            FileRW.copy(file, conn.getOutputStream());
             writer.append(CRLF).flush();
             // END of multipart/form-data
             writer.append("--" + boundary + "--").append(CRLF).flush();
@@ -163,28 +162,6 @@ public class HttpService extends IntentService {
             close(writer);
         }
         return success;
-    }
-
-    /**
-     * Copy a all bytes of a file to an output stream
-     * @param file nonNull File
-     * @param out nonNull OutputStream
-     */
-    private void copyFile(@NonNull File file, @NonNull OutputStream out) {
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(file);
-            int data;
-            while((data = in.read()) != -1) out.write(data);
-            out.flush();
-
-        } catch(FileNotFoundException e) {
-            Log.i(TAG, "copyFile(): FileNotFoundException");
-        } catch(IOException e) {
-            Log.i(TAG, "copyFile(): IOException");
-        } finally {
-            close(in);
-        }
     }
 
     /**
