@@ -153,9 +153,11 @@ public class BleDiscoveryService extends Service {
                 item.put("mac", deviceMac);
                 item.put("name", deviceName);
                 item.put("rssi", rssi);
-                item.put("latitude", location.getLatitude());
-                item.put("longitude", location.getLongitude());
-                item.put("altitude", location.getAltitude());
+                if(location != null) {
+                    item.put("latitude", location.getLatitude());
+                    item.put("longitude", location.getLongitude());
+                    item.put("altitude", location.getAltitude());
+                }
                 Log.i(TAG, "ScanCallback(): json = " + item.toString());
 
                 Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
