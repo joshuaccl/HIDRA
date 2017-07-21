@@ -69,7 +69,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         Log.i(TAG, "onDestroy(): stopping ServiceManager");
-        stopService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
+        startService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
         super.onDestroy();
     }
 

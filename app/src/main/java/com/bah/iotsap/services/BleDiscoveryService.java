@@ -27,10 +27,9 @@ import java.util.List;
  * containing information about the device in an intent broadcast that anyone can receive by
  * registering a receiver for the "RECEIVE_JSON" action.
  * This service will only operate if it has determined nothing should impede it.
- * TODO: Optimize scheduling of scans
+ * TODO: Get scan schedule information from sharedPreferences
  * TODO: Communicate with Bluetooth service when both are running to coordinate scans
  * TODO: Acquire locational data to send with each device intent
- * TODO: Write a function to check if app has all permissions required to run service
  */
 public class BleDiscoveryService extends Service {
 
@@ -44,17 +43,41 @@ public class BleDiscoveryService extends Service {
     public static final String PREF_BLE_SCANTIME = "pref_ble_scantime";
     public static final String PREF_BLE_DELAY    = "pref_ble_delay";
 
+    private BluetoothAdapter bleAdapter;    // Default bluetooth adapter
+    private BluetoothLeScanner leScanner;   // Default leScanner
+    private Handler handler;                // Used for scheduling scans
+    private boolean scanning;               // Tell if a scan is currently running
+    private long scantime;                  // Time to actively scan for devices
+    private long delay;                     // Time to wait after a scan before restarting
 
-    private BluetoothAdapter bleAdapter = BluetoothAdapter.getDefaultAdapter();
-    private BluetoothLeScanner leScanner;
-    private Handler handler;
-    private boolean scanning = false;
-    private long scantime = 10000;
+    private final Runnable stopper = new Runnable() {
+        @Override
+        public void run() {
+            Log.i(TAG, "stopper: stopping scan");
+            scanning = false;
+            leScanner.stopScan(leScanCallback);
+        }
+    };
+    private final Runnable starter = new Runnable() {
+        @Override
+        public void run() {
+            Log.i(TAG, "starter: starting scanLeDevice");
+            scanLeDevice(scanning);
+        }
+    };
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
+
+        // Initial instantiation with default values
+        bleAdapter = BluetoothAdapter.getDefaultAdapter();
+        handler  = new Handler();
+        scanning = false;
+        scantime = 7000;
+        delay    = 7000;
 
         // Ensure operation can run successfully
         if(!hasPermissions()) {
@@ -62,24 +85,17 @@ public class BleDiscoveryService extends Service {
             stopSelf();
         }
         leScanner = bleAdapter.getBluetoothLeScanner();
-        handler = new Handler();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
         if(START.equals(intent.getAction())) {
-
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i(TAG, "inner Runnable: run(): about to scan LE devices");
-                    scanLeDevice(true);
-                }
-            }, scantime);
-
+            Log.i(TAG, "onStartCommand(): action = " + START + ", about to begin scanLeDevice");
+            scanLeDevice(scanning);
         } else if(STOP.equals(intent.getAction())) {
-
+            Log.i(TAG, "onStartCommand(): action = " + STOP);
+            stopSelf();
         }
         return START_NOT_STICKY;
     }
@@ -88,31 +104,17 @@ public class BleDiscoveryService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy()");
+        handler.removeCallbacks(stopper);
+        handler.removeCallbacks(starter);
+        Log.i(TAG, "onDestroy(): removed callbacks");
     }
 
-    private boolean hasPermissions() {
-        Log.i(TAG, "hasPermissions()");
-        int fineLocationCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        if(fineLocationCheck != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "hasPermissions(): no FINE LOCATION");
-            return false;
-        } else if(bleAdapter == null) {
-            Log.i(TAG, "hasPermissions(): no BT ADAPTER");
-            return false;
-        } else return true;
-    }
-
-    private void scanLeDevice(final boolean enable) {
-        if(enable) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i(TAG, "scanLeDevice(): Runnable: run(): stopping scan");
-                    scanning = false;
-                    leScanner.stopScan(leScanCallback);
-                }
-            }, scantime);
+    private void scanLeDevice(final boolean isScanning) {
+        if(!isScanning) {
+            Log.i(TAG, "scanLeDevice(): Currently not scanning, adding postDelayed");
+            // Set runnable to stop the scan after some time
+            handler.postDelayed(stopper, scantime);
+            handler.postDelayed(starter, scantime + delay);
 
             Log.i(TAG, "scanLeDevice(): starting scan");
             scanning = true;
@@ -185,6 +187,19 @@ public class BleDiscoveryService extends Service {
             Log.i(TAG, "onScanFailed()");
         }
     };
+
+    private boolean hasPermissions() {
+        Log.i(TAG, "hasPermissions()");
+        int fineLocationCheck = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(fineLocationCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "hasPermissions(): no FINE LOCATION");
+            return false;
+        } else if(bleAdapter == null) {
+            Log.i(TAG, "hasPermissions(): no BT ADAPTER");
+            return false;
+        } else return true;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {

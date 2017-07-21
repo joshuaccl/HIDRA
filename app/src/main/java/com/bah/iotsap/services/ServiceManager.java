@@ -61,6 +61,7 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);   // Adapter on or off?
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);   // Enabled, disabled, enabling?
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);// Network connectivity change?
+        registerReceiver(receiver, filter);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
