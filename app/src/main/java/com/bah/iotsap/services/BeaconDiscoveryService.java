@@ -2,6 +2,7 @@ package com.bah.iotsap.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.location.Location;
 import android.os.IBinder;
 
 import android.app.Service;
@@ -11,6 +12,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 
+import com.bah.iotsap.util.LocationDiscovery;
 import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.estimote.coresdk.observation.region.Region;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
@@ -46,6 +48,7 @@ public class BeaconDiscoveryService extends Service {
     private DeviceConnectionProvider connectionProvider;
     private DeviceConnection connection;
     private BeaconRegion beacons;
+    private LocationDiscovery mLocationDiscovery;
 
 
     public BeaconDiscoveryService() {
@@ -53,6 +56,11 @@ public class BeaconDiscoveryService extends Service {
 
     public void onCreate() {
         super.onCreate();
+
+        //Initialize Location Discovery Object
+        mLocationDiscovery = new LocationDiscovery();
+        mLocationDiscovery.configureLocationClass(this);
+        mLocationDiscovery.startLocationUpdates();
 
         beacons = new BeaconRegion(
                 "monitored region",
@@ -72,6 +80,7 @@ public class BeaconDiscoveryService extends Service {
                         final Calendar time = Calendar.getInstance();
                         final String timeStamp = time.getTime().toString();
                         final Integer rssi = beacon.getRssi();
+                        final Location location = mLocationDiscovery.getLocation();
 
                         try {
                             JSONObject info = new JSONObject();
@@ -79,6 +88,9 @@ public class BeaconDiscoveryService extends Service {
                             info.put("mac", macAddress);
                             info.put("name", deviceName);
                             info.put("rssi", rssi);
+                            info.put("latitude", location.getLatitude());
+                            info.put("longitude", location.getLongitude());
+                            info.put("altitude", location.getAltitude());
                             Log.d("Service:", info.toString());
                             sendMessageToActivity(info.toString());
                         } catch (JSONException e) {
