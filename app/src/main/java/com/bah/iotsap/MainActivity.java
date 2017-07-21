@@ -17,7 +17,6 @@ import com.bah.iotsap.services.BeaconDiscoveryService;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
 import com.bah.iotsap.services.ServiceManager;
-import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 
 /**
  * This activity is basically a container for various fragments. It consists

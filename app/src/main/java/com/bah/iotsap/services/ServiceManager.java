@@ -114,6 +114,7 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
                 stopService(new Intent(getApplicationContext(), BleDiscoveryService.class));
             }
             if(isServiceRunning(BeaconDiscoveryService.class)) {
+                Log.i(TAG, "onStartCommand(): Stopping Beacon Service");
                 stopService(new Intent(getApplicationContext(), BeaconDiscoveryService.class));
             }
             Log.i(TAG, "onStartCommand(): Stopping Self");
@@ -169,9 +170,11 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
         //Beacon Settings
         if(BeaconDiscoveryService.PREF_BEACON_SERVICE.equals(key)) {
             if(sharedPreferences.getBoolean(key, false)) {
+                Log.i(TAG, "onSharedPreferenceCHanged(): Starting Beacon Service");
                 startService(new Intent(BeaconDiscoveryService.START, null,
                         getApplicationContext(), BeaconDiscoveryService.class));
             } else {
+                Log.i(TAG, "onSharedPreferenceChanged(): Stopping Beacon Service");
                 stopService(new Intent(getApplicationContext(), BeaconDiscoveryService.class));
             }
         }

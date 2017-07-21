@@ -158,7 +158,7 @@ public class BleDiscoveryService extends Service {
                     item.put("longitude", location.getLongitude());
                     item.put("altitude", location.getAltitude());
                 }
-                Log.i(TAG, "ScanCallback(): json = " + item.toString());
+                Log.d(TAG, "ScanCallback(): json = " + item.toString());
 
                 Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                 LocalBroadcastManager.getInstance(BleDiscoveryService.this).sendBroadcast(deviceInfo);

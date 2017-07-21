@@ -72,7 +72,7 @@ public class BluetoothDiscoveryService extends Service {
                     item.put("latitude", location.getLatitude());
                     item.put("longitude", location.getLongitude());
                     item.put("altitude", location.getAltitude());
-                    Log.i(TAG, item.toString());
+                    Log.d(TAG, item.toString());
 
                     Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                     LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);

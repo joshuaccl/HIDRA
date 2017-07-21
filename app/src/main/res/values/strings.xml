@@ -11,5 +11,7 @@
     <string name="pref_text_ble_service_summ">Enable BLE search polling</string>
     <string name="pref_text_nfc_service">NFC background service</string>
     <string name="pref_text_nfc_service_summ">Enable NFC background response</string>
+    <string name="pref_text_beacon_service">Beacon background service</string>
+    <string name="pref_text_beacon_service_summ">Enable Beacon background scanning</string>
 
 </resources>

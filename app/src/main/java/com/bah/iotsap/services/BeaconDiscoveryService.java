@@ -5,24 +5,13 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.IBinder;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 
 import com.bah.iotsap.util.LocationDiscovery;
-import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
-import com.estimote.coresdk.observation.region.Region;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
-import com.estimote.coresdk.recognition.packets.ConfigurableDevice;
 import com.estimote.coresdk.recognition.utils.MacAddress;
-import com.estimote.coresdk.repackaged.gson_v2_3_1.com.google.gson.JsonObject;
 import com.estimote.coresdk.service.BeaconManager;
-import com.estimote.mgmtsdk.common.exceptions.DeviceConnectionException;
-import com.estimote.mgmtsdk.connection.api.DeviceConnection;
-import com.estimote.mgmtsdk.connection.api.DeviceConnectionCallback;
 import com.estimote.mgmtsdk.connection.api.DeviceConnectionProvider;
 import com.estimote.coresdk.recognition.packets.Beacon;
 
@@ -37,16 +26,16 @@ import java.util.UUID;
 public class BeaconDiscoveryService extends Service {
 
     private static final String TAG = "BeaconDiscoveryService";
+    // Intent action strings
     public static final String RECEIVE_JSON = "com.bah.iotsap.services.BeaconDiscoveryService.RECEIVE_JSON";
     public static final String START = "com.bah.iotsap.services.BeaconDiscoveryService.START";
     public static final String STOP  = "com.bah.iotsap.services.BeaconDiscoveryService.STOP";
-
+    // SharedPreferences strings
     public static final String PREF_BEACON_SERVICE = "pref_beacon_service";
 
     private ArrayList<Beacon> beaconArrayList;
     private BeaconManager beaconManager;
     private DeviceConnectionProvider connectionProvider;
-    private DeviceConnection connection;
     private BeaconRegion beacons;
     private LocationDiscovery mLocationDiscovery;
 
@@ -56,6 +45,7 @@ public class BeaconDiscoveryService extends Service {
 
     public void onCreate() {
         super.onCreate();
+        Log.i(TAG, "onCreate(): Entered");
 
         //Initialize Location Discovery Object
         mLocationDiscovery = new LocationDiscovery();
@@ -91,7 +81,7 @@ public class BeaconDiscoveryService extends Service {
                             info.put("latitude", location.getLatitude());
                             info.put("longitude", location.getLongitude());
                             info.put("altitude", location.getAltitude());
-                            Log.d("Service:", info.toString());
+                            Log.d(TAG, info.toString());
                             sendMessageToActivity(info.toString());
                         } catch (JSONException e) {
 
@@ -139,9 +129,11 @@ public class BeaconDiscoveryService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand()");
 //        beaconManager.setForegroundScanPeriod(2000,2000);
 //        beaconManager.setBackgroundScanPeriod(10000,5000);
         if(START.equals(intent.getAction())) {
+            Log.i(TAG, "onStartCommand(): Entered START action");
 
             beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
                 @Override
@@ -222,12 +214,16 @@ public class BeaconDiscoveryService extends Service {
 //                              });
 //        beaconManager.startConfigurableDevicesDiscovery();
         }
-        else if(STOP.equals(intent.getAction())) {}
+        else if(STOP.equals(intent.getAction())) {
+            Log.i(TAG, "onStartCommand(): Entered STOP action");
+            stopSelf();
+        }
         return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "onDestroy()");
         connectionProvider.destroy();
         beaconArrayList.clear();
         super.onDestroy();

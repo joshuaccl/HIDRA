@@ -28,9 +28,10 @@
         android:title="@string/pref_text_nfc_service"
         android:summary="@string/pref_text_nfc_service_summ"
         android:defaultValue="true"/>
+    <!-- Beacon Background service discovery -->
     <CheckBoxPreference
         android:key="pref_beacon_service"
-        android:title="Beacon background service"
-        android:summary="Enable Beacon background scanning"
+        android:title="@string/pref_text_beacon_service"
+        android:summary="@string/pref_text_beacon_service_summ"
         android:defaultValue="true"/>
 </PreferenceScreen>
