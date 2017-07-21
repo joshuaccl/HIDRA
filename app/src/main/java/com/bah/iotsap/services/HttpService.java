@@ -38,6 +38,8 @@ public class HttpService extends IntentService {
     public  static final String FILENAME = "title";
     public  static final String DESC     = "description";
 
+    private static final int CONN_TIMEOUT = 3000;
+    private static final int READ_TIMEOUT = 3000;
 
 
     public HttpService() {
@@ -90,7 +92,7 @@ public class HttpService extends IntentService {
         File file = null;
 
 
-        // TEST CODE FOR FILE
+        // TEST CODE - DELETE LATER
         filename = "myTestFile100.txt";
         String contents = "hello world! This is a test file to ensure can upload files to a server";
         try {
@@ -117,38 +119,63 @@ public class HttpService extends IntentService {
         }
         // END TEST CODE
 
-        // Guard against invalid
+        // Guard against invalid intnt extras
         if(filename == null || filename.isEmpty() ||
-                address  == null || address.isEmpty()) {
+           address  == null || address.isEmpty()) {
             Log.i(TAG, "sendFile(): Entered GUARD, invalid filename or address");
             return success;
         }
 
+        /**
+         * Primary block where the following happens:
+         * 1. A HttpURLConnection is made to the provided address.
+         * 2. Configure the connection so we can write to it, so it timesout instead of blocking,
+         *    so we write a POST....
+         * 3. A Writer is set up to write strings / files to the output stream of the connection.
+         * 4. A HTTP form is written then the provided file
+         * 5. Response code is checked for error handling
+         */
         try {
-            url = new URL(address);
+            Log.i(TAG, "sendFile(): Entered main try block");
+            url  = new URL(address);
             file = new File(getFilesDir(), filename);
 
             // HTTP connection / header setup
+            Log.i(TAG, "sendFile(): Setting up HTTP connection");
             conn = (HttpURLConnection) url.openConnection();
-            conn.setDoInput(true); // Allow inputs on connection
-            conn.setDoOutput(true); // Allow outputs on connection
-            conn.setChunkedStreamingMode(0); // Body length is unknown
-            conn.setRequestMethod("POST"); // Post information to server
+            conn.setDoInput(true);                  // Allow inputs on connection
+            conn.setDoOutput(true);                 // Allow outputs on connection
+            conn.setReadTimeout(READ_TIMEOUT);      // prevent getRequestCode from blocking
+            conn.setConnectTimeout(CONN_TIMEOUT);   // Timeout if connection unavailable
+            conn.setChunkedStreamingMode(0);        // Body length is unknown
+            conn.setRequestMethod("POST");          // Post information to server
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
+            // Check to see if connection was successful
+            Log.i(TAG, "Checking for connection success");
+            if(HttpURLConnection.HTTP_ACCEPTED != conn.getResponseCode() &&
+               HttpURLConnection.HTTP_OK       != conn.getResponseCode()) {
+                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
+                throw new IOException("Could not connect to address and/or get responseCode");
+            }
+
             // Setup stream writer
+            Log.i(TAG, "sendFile(): Settings up PrintWriter");
             writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8));
             // Send text file
+            Log.i(TAG, "sendFile(): About to begin writing body fields");
             writer.append("--" + boundary).append(CRLF);
             writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"").append(CRLF);
             writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.toString()).append(CRLF);
             writer.append(CRLF).flush();
             // copy all bytes of file to output stream
+            Log.i(TAG, "sendFile(): About to write file to stream");
             FileRW.copy(file, conn.getOutputStream());
             writer.append(CRLF).flush();
             // END of multipart/form-data
             writer.append("--" + boundary + "--").append(CRLF).flush();
 
+            Log.i(TAG, "sendFile(): Gettings response code");
             int responseCode = conn.getResponseCode();
             Log.i(TAG, "sendFile(): responseCode = " + responseCode);
 
@@ -161,6 +188,7 @@ public class HttpService extends IntentService {
             conn.disconnect();
             close(writer);
         }
+        Log.i(TAG, "sendFile(): success = " + success);
         return success;
     }
 
