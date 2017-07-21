@@ -1,22 +1,17 @@
 package com.example.a591266.buildbutton;
 
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
-import android.nfc.NfcManager;
+import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,42 +19,22 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
-
-    private final BroadcastReceiver receiver =  new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "onReceive()");
-            String action = intent.getAction();
-            if(NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-                Log.i(TAG, "onReceive(): action ndef");
-            } else if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
-                Log.i(TAG, "onReceive(): action tag discovered");
-            }
-        }
-    };
+    private Button button;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        button = (Button) findViewById(R.id.write_button);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                Log.i(TAG, "onClick(): About to start Main2Activity");
+                startActivity(new Intent(MainActivity.this, Main2Activity.class));
             }
         });
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        filter.addAction(NfcAdapter.ACTION_TAG_DISCOVERED);
-        filter.addAction(NfcAdapter.ACTION_TECH_DISCOVERED);
-
-        registerReceiver(receiver, filter);
 
         //Set up NFC Adapter
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -73,39 +48,50 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        ///Creating button that will click to NFC page
-        Button nfc_btn = (Button) findViewById(R.id.nfcbutton);
-        nfc_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("MainActivity", "Please log");
+        if (!nfcAdapter.isEnabled())
+        {
+            Log.i(TAG, "onCreate(): nfcAdapter is not enabled");
+            Toast.makeText(this, "Please enable NFC Adapter", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
 
-                //Change to other page
-                Intent page = new Intent(MainActivity.this, Main2Activity.class);
-                startActivity(page);
-            }
-        });
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected void onPause() {
+        super.onPause();
+        nfcAdapter.disableForegroundDispatch(this);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent == null) {
+            Log.i(TAG, "onNewIntent(): NULL INTENT");
+            return;
         }
 
-        return super.onOptionsItemSelected(item);
+        Log.i(TAG, "onNewIntent(): action = " + intent.getAction() + ", Type = " + intent.getType());
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            Log.i(TAG, "onNewIntent(): tag to string: " + tag.toString());
+
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            if (rawMsgs != null) {
+                //Parsing through ndef msg?
+                NdefMessage[] msgs = new NdefMessage[rawMsgs.length];
+                for (int i = 0; i < msgs.length; ++i) {
+                    msgs[i] = (NdefMessage) rawMsgs[i];
+                    Log.i(TAG, "onNewIntent() : Message" + i + " = " + msgs[i].toString());
+                }
+            }
+        }
     }
 }

@@ -31,7 +31,7 @@ public class Main3Activity extends AppCompatActivity {
 
     public static final String CONTENT_MIME_TYPE = "com.bah.buildbutton/test";
     private static final String TAG = "Main3Activity";
-    private NfcAdapter mAdapter;
+    private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
 
     @Override
@@ -39,9 +39,9 @@ public class Main3Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
 
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-        if (mAdapter == null)
+        if (nfcAdapter == null)
         {
             Log.i(TAG, "onCreate(): no nfcAdapter available");
             Toast.makeText(this, "no NFCAdapter available", Toast.LENGTH_SHORT).show();
@@ -50,7 +50,7 @@ public class Main3Activity extends AppCompatActivity {
 
         pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(
                 Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        IntentFilter tagDetected = new IntentFilter(mAdapter.ACTION_TAG_DISCOVERED);
+        IntentFilter tagDetected = new IntentFilter(nfcAdapter.ACTION_TAG_DISCOVERED);
 
         //How to
         tagDetected.addCategory(Intent.CATEGORY_DEFAULT);

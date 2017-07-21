@@ -27,13 +27,14 @@ import java.nio.charset.StandardCharsets;
 
 public class Main2Activity extends AppCompatActivity {
 
+    //calling this string whatever we want
+    private static final String CONTENT_MIME_TYPE = "com.example.a591266.buildbutton/test";
+
     private static final String TAG = "Main2Activity";
+    private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
-    private NfcAdapter mAdapter;
     private IntentFilter writeTagFilters[];
 
-    //calling this string whatever we want
-    private static final String CONTENT_MIME_TYPE = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +69,13 @@ public class Main2Activity extends AppCompatActivity {
         //message.
 
         //Getting the NFC adapter
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
-
-
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter == null)
+        {
+            Log.i(TAG, "onCreate(): no nfcAdapter available");
+            Toast.makeText(this, "No NFCAdapter available", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         pendingIntent = PendingIntent.getActivity(
                 this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         Log.i(TAG, "onCreate\n");
@@ -80,16 +85,16 @@ public class Main2Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //NfcAdapter mAdapter;
-        mAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        //NfcAdapter nfcAdapter;
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
         Log.i(TAG, "onResume\n");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //NfcAdapter mAdapter;
-        mAdapter.disableForegroundDispatch(this);
+        //NfcAdapter nfcAdapter;
+        nfcAdapter.disableForegroundDispatch(this);
         Log.i(TAG, "onPause\n");
     }
 
@@ -110,37 +115,37 @@ public class Main2Activity extends AppCompatActivity {
 
         JSONObject
 */
-        IntentFilter tagDetected = new IntentFilter(mAdapter.ACTION_TAG_DISCOVERED);
-        tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
+//        IntentFilter tagDetected = new IntentFilter(nfcAdapter.ACTION_TAG_DISCOVERED);
+//        tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
+//
+//        //Checks for the ACTION_NDEF_DISCOVERED intent and gets the NDEF messages from an intent extra
+//        if (intent != null && nfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
+//        {
+//            Log.i(TAG, "Did not find NDEF message");
+//            Parcelable [] rawMessages =
+//                    intent.getParcelableArrayExtra(nfcAdapter.EXTRA_NDEF_MESSAGES);
+//
+//        if (nfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
+//        {
+//            Log.i(TAG, "this intent has getAction");
+//        }
+//            if (rawMessages != null)
+//            {
+//                Log.i(TAG, "Found an NDEF message");
+//                NdefMessage [] messages = new NdefMessage[rawMessages.length];
+//                for (int counter = 0; counter < rawMessages.length; counter++)
+//                {
+//                    messages[counter] = (NdefMessage) rawMessages[counter];
+//                    Log.i(TAG, messages[counter].toString());
+//                }
+//                //Process the message array
+//            }
+//        }
 
-        //Checks for the ACTION_NDEF_DISCOVERED intent and gets the NDEF messages from an intent extra
-        if (intent != null && mAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
-        {
-            Log.i(TAG, "Did not find NDEF message");
-            Parcelable [] rawMessages =
-                    intent.getParcelableArrayExtra(mAdapter.EXTRA_NDEF_MESSAGES);
+        //String cat = null;
+        //cat.equals("cat");
 
-        if (mAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
-        {
-            Log.i(TAG, "this intent has getAction");
-        }
-            if (rawMessages != null)
-            {
-                Log.i(TAG, "Found an NDEF message");
-                NdefMessage [] messages = new NdefMessage[rawMessages.length];
-                for (int counter = 0; counter < rawMessages.length; counter++)
-                {
-                    messages[counter] = (NdefMessage) rawMessages[counter];
-                    Log.i(TAG, messages[counter].toString());
-                }
-                //Process the message array
-            }
-        }
-
-        Tag tag_ = intent.getParcelableExtra(mAdapter.EXTRA_TAG);
-        String cat = null;
-        cat.equals("cat");
-
+        Tag tag_ = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         NdefRecord rec = new NdefRecord(NdefRecord.TNF_MIME_MEDIA,
                 CONTENT_MIME_TYPE.getBytes(StandardCharsets.US_ASCII),
                 new byte[0],
