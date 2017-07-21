@@ -1,4 +1,4 @@
-package com.bah.iotsap;
+package com.bah.iotsap.util;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
