@@ -29,9 +29,9 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
-                    <category android:name="android.intent.category.DEFAULT"/>
-
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+
             <!--XML file that tells what tech activity supports
                 Attaching XML file -->
             <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
@@ -40,11 +40,27 @@
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+        </activity>
+
+
         <activity
             android:name=".Main3Activity"
             android:label="@string/title_activity_main3"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+
     </application>
 
 </manifest>

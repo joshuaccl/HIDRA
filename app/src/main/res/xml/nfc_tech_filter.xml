@@ -7,6 +7,7 @@
         <tech>android.nfc.tech.NfcB</tech>
     </tech-list>
 </resources>
+<!--This is to add different NFC's (there are diff types of NFC)-->
 <!--<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">-->
     <!--<tech-list>-->
         <!--<tech>android.nfc.tech.IsoDep</tech>-->

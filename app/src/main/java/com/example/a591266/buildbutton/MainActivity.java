@@ -1,5 +1,6 @@
 package com.example.a591266.buildbutton;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +17,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    //private final NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+    private NfcAdapter nfcAdapter;
+    private PendingIntent pendingIntent;
 
     private final BroadcastReceiver receiver =  new BroadcastReceiver() {
         @Override
@@ -58,6 +61,17 @@ public class MainActivity extends AppCompatActivity {
 
         registerReceiver(receiver, filter);
 
+        //Set up NFC Adapter
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        pendingIntent = PendingIntent.getActivity(
+                this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0);
+
+        if(nfcAdapter == null)
+        {
+            Log.i(TAG, "onCreate(): nfcAdapter is null");
+            Toast.makeText(this, "No NFC capability", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         ///Creating button that will click to NFC page
         Button nfc_btn = (Button) findViewById(R.id.nfcbutton);
