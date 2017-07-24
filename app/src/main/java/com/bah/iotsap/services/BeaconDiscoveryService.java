@@ -88,9 +88,11 @@ public class BeaconDiscoveryService extends Service {
                             info.put("mac", macAddress);
                             info.put("name", deviceName);
                             info.put("rssi", rssi);
-                            info.put("latitude", location.getLatitude());
-                            info.put("longitude", location.getLongitude());
-                            info.put("altitude", location.getAltitude());
+                            if(location != null) {
+                                info.put("latitude", location.getLatitude());
+                                info.put("longitude", location.getLongitude());
+                                info.put("altitude", location.getAltitude());
+                            }
                             Log.d("Service:", info.toString());
                             sendMessageToActivity(info.toString());
                         } catch (JSONException e) {
