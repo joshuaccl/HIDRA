@@ -91,37 +91,9 @@ public class HttpService extends IntentService {
         PrintWriter writer = null;
         File file = null;
 
-
-        // TEST CODE - DELETE LATER
-        filename = "myTestFile100.txt";
-        String contents = "hello world! This is a test file to ensure can upload files to a server";
-        try {
-            FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
-            fos.write(contents.getBytes(StandardCharsets.UTF_8));
-            fos.close();
-
-            File myFile = new File(getFilesDir(), filename);
-            Scanner scanner = new Scanner(myFile);
-            String fileContents = scanner.nextLine();
-            scanner.close();
-            if(contents.equals(fileContents)) {
-                Log.i(TAG, "file contents EQUAL");
-            } else {
-                Log.i(TAG, "file contents NOT EQUAL!");
-                Log.i(TAG, "contents = " + contents);
-                Log.i(TAG, "fileContents = " + fileContents);
-            }
-
-        } catch(FileNotFoundException e) {
-            Log.i(TAG, "sendFile(Intent): FileNotFoundException");
-        } catch(IOException e) {
-            Log.i(TAG, "sendFile(Intent): IOException");
-        }
-        // END TEST CODE
-
         // Guard against invalid intnt extras
         if(filename == null || filename.isEmpty() ||
-           address  == null || address.isEmpty()) {
+                address  == null || address.isEmpty()) {
             Log.i(TAG, "sendFile(): Entered GUARD, invalid filename or address");
             return success;
         }
@@ -151,13 +123,13 @@ public class HttpService extends IntentService {
             conn.setRequestMethod("POST");          // Post information to server
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
-            // Check to see if connection was successful
-            Log.i(TAG, "Checking for connection success");
-            if(HttpURLConnection.HTTP_ACCEPTED != conn.getResponseCode() &&
-               HttpURLConnection.HTTP_OK       != conn.getResponseCode()) {
-                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
-                throw new IOException("Could not connect to address and/or get responseCode");
-            }
+//            // Check to see if connection was successful
+//            Log.i(TAG, "Checking for connection success");
+//            if(HttpURLConnection.HTTP_ACCEPTED != conn.getResponseCode() &&
+//                    HttpURLConnection.HTTP_OK       != conn.getResponseCode()) {
+//                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
+//                throw new IOException("Could not connect to address and/or get responseCode");
+//            }
 
             // Setup stream writer
             Log.i(TAG, "sendFile(): Settings up PrintWriter");

@@ -1,6 +1,7 @@
 package com.bah.iotsap.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.IBinder;
@@ -12,6 +13,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 
+import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.estimote.coresdk.observation.region.Region;
@@ -49,6 +51,7 @@ public class BeaconDiscoveryService extends Service {
     private DeviceConnection connection;
     private BeaconRegion beacons;
     private LocationDiscovery mLocationDiscovery;
+    private Context mContext;
 
 
     public BeaconDiscoveryService() {
@@ -61,6 +64,10 @@ public class BeaconDiscoveryService extends Service {
         mLocationDiscovery = new LocationDiscovery();
         mLocationDiscovery.configureLocationClass(this);
         mLocationDiscovery.startLocationUpdates();
+
+        mContext = this;
+
+        FileRW.init(mContext,"beacon");
 
         beacons = new BeaconRegion(
                 "monitored region",
@@ -94,6 +101,8 @@ public class BeaconDiscoveryService extends Service {
                                 info.put("altitude", location.getAltitude());
                             }
                             Log.d("Service:", info.toString());
+
+                            FileRW.append(mContext, "beacon", info.toString());
                             sendMessageToActivity(info.toString());
                         } catch (JSONException e) {
 

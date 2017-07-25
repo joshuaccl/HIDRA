@@ -15,11 +15,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -45,6 +47,7 @@ public class BluetoothDiscoveryService extends Service {
     public static final String PREF_BT_DELAY    = "pref_bt_delay";
 
     private LocationDiscovery mLocationDiscovery;
+    private Context mContext;
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -76,6 +79,8 @@ public class BluetoothDiscoveryService extends Service {
                     }
                     Log.i(TAG, item.toString());
 
+                    FileRW.append(mContext, "bt", item.toString());
+
                     Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                     LocalBroadcastManager.getInstance(BluetoothDiscoveryService.this).sendBroadcast(deviceInfo);
                 } catch(JSONException e) {
@@ -103,6 +108,10 @@ public class BluetoothDiscoveryService extends Service {
         mLocationDiscovery = new LocationDiscovery();
         mLocationDiscovery.configureLocationClass(this);
         mLocationDiscovery.startLocationUpdates();
+
+        mContext = this;
+
+        FileRW.init(mContext,"bt");
 
         // Bluetooth discovery setup
         IntentFilter filter = new IntentFilter();

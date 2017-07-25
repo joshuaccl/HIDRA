@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
 import org.json.JSONException;
@@ -53,6 +55,7 @@ public class BleDiscoveryService extends Service {
     private long scantime;                  // Time to actively scan for devices
     private long delay;                     // Time to wait after a scan before restarting
     private LocationDiscovery mLocationDiscovery; //Location class for getting the location
+    private Context mContext;
 
     private final Runnable stopper = new Runnable() {
         @Override
@@ -75,6 +78,8 @@ public class BleDiscoveryService extends Service {
         super.onCreate();
         Log.i(TAG, "onCreate()");
 
+        mContext = this;
+
         // Initial instantiation with default values
         bleAdapter = BluetoothAdapter.getDefaultAdapter();
         handler  = new Handler();
@@ -93,6 +98,8 @@ public class BleDiscoveryService extends Service {
         mLocationDiscovery.startLocationUpdates();
 
         leScanner = bleAdapter.getBluetoothLeScanner();
+
+        FileRW.init(mContext, "ble");
     }
 
     @Override
@@ -159,6 +166,8 @@ public class BleDiscoveryService extends Service {
                     item.put("altitude", location.getAltitude());
                 }
                 Log.i(TAG, "ScanCallback(): json = " + item.toString());
+
+                FileRW.append(mContext, "ble", item.toString());
 
                 Intent deviceInfo = new Intent(RECEIVE_JSON).putExtra("json", item.toString());
                 LocalBroadcastManager.getInstance(BleDiscoveryService.this).sendBroadcast(deviceInfo);

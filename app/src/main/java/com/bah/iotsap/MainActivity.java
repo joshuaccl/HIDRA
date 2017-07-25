@@ -16,6 +16,8 @@ import android.util.SparseArray;
 import com.bah.iotsap.services.BeaconDiscoveryService;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
+import com.bah.iotsap.services.HttpService;
+import com.bah.iotsap.services.SendFileService;
 import com.bah.iotsap.services.ServiceManager;
 import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 
@@ -63,6 +65,7 @@ public class MainActivity extends FragmentActivity {
 
         // Service manager handles launching services that are able to run on device
         startService(new Intent(ServiceManager.START, null, this, ServiceManager.class));
+        startService(new Intent(this, SendFileService.class));
     }
 
     @Override
