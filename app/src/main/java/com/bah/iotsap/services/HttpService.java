@@ -10,6 +10,7 @@ import com.bah.iotsap.util.FileRW;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Scanner;
 
 
@@ -37,6 +40,9 @@ public class HttpService extends IntentService {
     public  static final String ADDRESS  = "address";
     public  static final String FILENAME = "title";
     public  static final String DESC     = "description";
+    public String fileContents;
+    private Context mContext;
+    private String filename;
 
     private static final int CONN_TIMEOUT = 3000;
     private static final int READ_TIMEOUT = 3000;
@@ -50,6 +56,7 @@ public class HttpService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
+        mContext = this;
     }
 
     @Override
@@ -82,14 +89,47 @@ public class HttpService extends IntentService {
         boolean success = false;
 
         // File and address Strings
-        String address = "http://192.168.1.100:8080/upload/"; // intent.getStringExtra(ADDRESS);
-        String filename = intent.getStringExtra(FILENAME);
+        String address = "http://192.168.1.100:8080/upload"; // intent.getStringExtra(ADDRESS);
+        filename = intent.getStringExtra(FILENAME);
         String desc = intent.getStringExtra(DESC);
         String boundary = Long.toHexString(System.currentTimeMillis());
         URL url;
         HttpURLConnection conn = null;
         PrintWriter writer = null;
         File file = null;
+
+
+//        // TEST CODE - DELETE LATER
+//        Random random = new Random();
+//        filename = "myTestFile" + Integer.toString(random.nextInt(500)) + ".txt";
+//        String contents = "hello world! This is a test file to ensure can upload files to a server";
+//        try {
+//            FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+//            fos.write(contents.getBytes(StandardCharsets.UTF_8));
+//            fos.close();
+//
+//            File myFile = new File(getFilesDir(), filename);
+//            Scanner scanner = new Scanner(myFile);
+//            String fileContents = scanner.nextLine();
+//            scanner.close();
+//            if(contents.equals(fileContents)) {
+//                Log.i(TAG, "file contents EQUAL");
+//            } else {
+//                Log.i(TAG, "file contents NOT EQUAL!");
+//                Log.i(TAG, "contents = " + contents);
+//                Log.i(TAG, "fileContents = " + fileContents);
+//            }
+//
+//        } catch(FileNotFoundException e) {
+//            Log.i(TAG, "sendFile(Intent): FileNotFoundException");
+//            Log.i(TAG, "FNFE: " + e.getMessage());
+//            e.printStackTrace();
+//        } catch(IOException e) {
+//            Log.i(TAG, "sendFile(Intent): IOException");
+//            Log.i(TAG, "IOE: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//        // END TEST CODE
 
         // Guard against invalid intnt extras
         if(filename == null || filename.isEmpty() ||
@@ -111,6 +151,12 @@ public class HttpService extends IntentService {
             Log.i(TAG, "sendFile(): Entered main try block");
             url  = new URL(address);
             file = new File(getFilesDir(), filename);
+            if (file!= null) {
+                Scanner scanner = new Scanner(file);
+                fileContents = scanner.nextLine();
+                scanner.close();
+            }
+            Log.i(TAG, "sendFile(): File contents are: " + fileContents);
 
             // HTTP connection / header setup
             Log.i(TAG, "sendFile(): Setting up HTTP connection");
@@ -123,14 +169,6 @@ public class HttpService extends IntentService {
             conn.setRequestMethod("POST");          // Post information to server
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
-//            // Check to see if connection was successful
-//            Log.i(TAG, "Checking for connection success");
-//            if(HttpURLConnection.HTTP_ACCEPTED != conn.getResponseCode() &&
-//                    HttpURLConnection.HTTP_OK       != conn.getResponseCode()) {
-//                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
-//                throw new IOException("Could not connect to address and/or get responseCode");
-//            }
-
             // Setup stream writer
             Log.i(TAG, "sendFile(): Settings up PrintWriter");
             writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8));
@@ -138,7 +176,7 @@ public class HttpService extends IntentService {
             Log.i(TAG, "sendFile(): About to begin writing body fields");
             writer.append("--" + boundary).append(CRLF);
             writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"").append(CRLF);
-            writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.toString()).append(CRLF);
+            writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.name()).append(CRLF);
             writer.append(CRLF).flush();
             // copy all bytes of file to output stream
             Log.i(TAG, "sendFile(): About to write file to stream");
@@ -149,18 +187,33 @@ public class HttpService extends IntentService {
 
             Log.i(TAG, "sendFile(): Gettings response code");
             int responseCode = conn.getResponseCode();
+            Log.i(TAG, "Checking for connection success");
+            if(HttpURLConnection.HTTP_ACCEPTED != responseCode &&
+                    HttpURLConnection.HTTP_OK       != responseCode) {
+                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
+                throw new IOException("Could not connect to address and/or get responseCode");
+            }
             Log.i(TAG, "sendFile(): responseCode = " + responseCode);
 
             success = true;
         } catch(MalformedURLException e) {
-            Log.i(TAG, "sendFile(): MalformedURLException");
+            Log.i(TAG, "sendFile(): MalformedURLException" + e);
         } catch(IOException e) {
-            Log.i(TAG, "sendFile(): IOException");
+            Log.i(TAG, "sendFile(): IOException" + e);
+        } catch (NoSuchElementException e) {
+            Log.i(TAG, "sendFile(): NoSuchElementException" + e);
         } finally {
-            conn.disconnect();
-            close(writer);
+            if(conn!= null) {
+                conn.disconnect();
+                close(writer);
+            }
         }
         Log.i(TAG, "sendFile(): success = " + success);
+
+        if (success==true) {
+            FileRW.delete(mContext, filename);
+            FileRW.init(mContext, filename);
+        }
         return success;
     }
 
