@@ -34,13 +34,42 @@
                 android:paddingRight="@dimen/topbar_item_padding"
                 android:src="@drawable/ic_more_vert_black_24px"/>
             <Button
+                android:id="@+id/map_top_linear_self_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/topbar_item_text_size"
                 android:background="@android:color/transparent"
                 android:paddingLeft="@dimen/topbar_item_padding"
                 android:paddingRight="@dimen/topbar_item_padding"
-                android:text="TEST1" />
+                android:text="SELF" />
+            <Button
+                android:id="@+id/map_top_linear_styl_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="STYL"/>
+            <Button
+                android:id="@+id/map_top_linear_filt_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="FILT"/>
+            <Button
+                android:id="@+id/map_top_linear_updt_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="UPDT"/>
+
         </LinearLayout>
 
     </LinearLayout>

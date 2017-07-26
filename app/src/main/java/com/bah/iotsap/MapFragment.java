@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
@@ -24,14 +25,42 @@ public class MapFragment extends Fragment {
 
     private MapView mapView;
     private ImageButton moreBtn;
+    private Button selfBtn;
+    private Button stylBtn;
+    private Button filtBtn;
+    private Button updtBtn;
     private View.OnClickListener moreBtnListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "onClick()");
+            Log.i(TAG, "more onClick()");
             PopupMenu menu = new PopupMenu(getActivity().getApplicationContext(), moreBtn);
             menu.getMenuInflater().inflate(R.menu.more_dropdown_menu, menu.getMenu());
             menu.setOnMenuItemClickListener(menuItemClickListener);
             menu.show();
+        }
+    };
+    private View.OnClickListener selfBtnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.i(TAG, "self onClick()");
+        }
+    };
+    private View.OnClickListener stylBtnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.i(TAG, "styl onClick()");
+        }
+    };
+    private View.OnClickListener filtBtnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.i(TAG, "filt onClick()");
+        }
+    };
+    private View.OnClickListener updtBtnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.i(TAG, "updt onClick()");
         }
     };
     private PopupMenu.OnMenuItemClickListener menuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
@@ -64,7 +93,15 @@ public class MapFragment extends Fragment {
 
         // UI setup
         moreBtn = (ImageButton) fragmentLayout.findViewById(R.id.map_top_linear_more_btn);
+        selfBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_self_btn);
+        stylBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_styl_btn);
+        filtBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_filt_btn);
+        updtBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_updt_btn);
         moreBtn.setOnClickListener(moreBtnListener);
+        selfBtn.setOnClickListener(selfBtnListener);
+        stylBtn.setOnClickListener(stylBtnListener);
+        filtBtn.setOnClickListener(filtBtnListener);
+        updtBtn.setOnClickListener(updtBtnListener);
 
         // MapView setup
         mapView = (MapView) fragmentLayout.findViewById(R.id.mapView);
