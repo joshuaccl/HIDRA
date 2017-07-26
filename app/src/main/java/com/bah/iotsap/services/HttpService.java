@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.Scanner;
 
 
@@ -82,7 +83,7 @@ public class HttpService extends IntentService {
         boolean success = false;
 
         // File and address Strings
-        String address = "http://192.168.1.100:8080/upload/"; // intent.getStringExtra(ADDRESS);
+        String address = "http://192.168.1.100:8080/upload"; // intent.getStringExtra(ADDRESS);
         String filename = intent.getStringExtra(FILENAME);
         String desc = intent.getStringExtra(DESC);
         String boundary = Long.toHexString(System.currentTimeMillis());
@@ -93,7 +94,8 @@ public class HttpService extends IntentService {
 
 
         // TEST CODE - DELETE LATER
-        filename = "myTestFile100.txt";
+        Random random = new Random();
+        filename = "myTestFile" + Integer.toString(random.nextInt(500)) + ".txt";
         String contents = "hello world! This is a test file to ensure can upload files to a server";
         try {
             FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
@@ -114,8 +116,12 @@ public class HttpService extends IntentService {
 
         } catch(FileNotFoundException e) {
             Log.i(TAG, "sendFile(Intent): FileNotFoundException");
+            Log.i(TAG, "FNFE: " + e.getMessage());
+            e.printStackTrace();
         } catch(IOException e) {
             Log.i(TAG, "sendFile(Intent): IOException");
+            Log.i(TAG, "IOE: " + e.getMessage());
+            e.printStackTrace();
         }
         // END TEST CODE
 
@@ -151,14 +157,6 @@ public class HttpService extends IntentService {
             conn.setRequestMethod("POST");          // Post information to server
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
-            // Check to see if connection was successful
-            Log.i(TAG, "Checking for connection success");
-            if(HttpURLConnection.HTTP_ACCEPTED != conn.getResponseCode() &&
-               HttpURLConnection.HTTP_OK       != conn.getResponseCode()) {
-                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
-                throw new IOException("Could not connect to address and/or get responseCode");
-            }
-
             // Setup stream writer
             Log.i(TAG, "sendFile(): Settings up PrintWriter");
             writer = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8));
@@ -166,7 +164,7 @@ public class HttpService extends IntentService {
             Log.i(TAG, "sendFile(): About to begin writing body fields");
             writer.append("--" + boundary).append(CRLF);
             writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"").append(CRLF);
-            writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.toString()).append(CRLF);
+            writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.name()).append(CRLF);
             writer.append(CRLF).flush();
             // copy all bytes of file to output stream
             Log.i(TAG, "sendFile(): About to write file to stream");
@@ -177,13 +175,19 @@ public class HttpService extends IntentService {
 
             Log.i(TAG, "sendFile(): Gettings response code");
             int responseCode = conn.getResponseCode();
+            Log.i(TAG, "Checking for connection success");
+            if(HttpURLConnection.HTTP_ACCEPTED != responseCode &&
+               HttpURLConnection.HTTP_OK       != responseCode) {
+                Log.i(TAG, "sendFile(): Connection unsuccessful, aborting");
+                throw new IOException("Could not connect to address and/or get responseCode");
+            }
             Log.i(TAG, "sendFile(): responseCode = " + responseCode);
 
             success = true;
         } catch(MalformedURLException e) {
-            Log.i(TAG, "sendFile(): MalformedURLException");
+            Log.i(TAG, "sendFile(): MalformedURLException", e);
         } catch(IOException e) {
-            Log.i(TAG, "sendFile(): IOException");
+            Log.i(TAG, "sendFile(): IOException", e);
         } finally {
             conn.disconnect();
             close(writer);
