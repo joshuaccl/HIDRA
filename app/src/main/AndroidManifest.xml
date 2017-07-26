@@ -73,7 +73,11 @@
         <service
             android:name=".services.BeaconDiscoveryService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="false" />
+        <service
+            android:name=".services.SendFileService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

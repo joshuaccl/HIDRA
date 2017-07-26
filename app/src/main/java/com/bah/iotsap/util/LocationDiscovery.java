@@ -89,7 +89,7 @@ public class LocationDiscovery {
     //call this method to receive the location
     public Location getLocation() {
         clickCount++;
-        Log.d("Click", Integer.toString(clickCount));
+//        Log.d("Click", Integer.toString(clickCount));
         currentLocationRequest = new LocationRequest();
         currentLocationRequest.setInterval(10000);
         currentLocationRequest.setFastestInterval(5000);
