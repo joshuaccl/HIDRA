@@ -62,9 +62,12 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView()");
         View fragmentLayout = inflater.inflate(R.layout.fragment_map, container, false);
+
+        // MapView setup
         mapView = (MapView) fragmentLayout.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
 
+        // HUD setup
         moreBtn = (Button) fragmentLayout.findViewById(R.id.map_left_more_button);
         nfcBtn  = (Button) fragmentLayout.findViewById(R.id.map_left_nfc_button);
         rfidBtn = (Button) fragmentLayout.findViewById(R.id.map_left_rfid_button);
