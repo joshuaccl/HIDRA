@@ -10,6 +10,7 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -26,13 +27,12 @@ import com.bah.iotsap.services.ServiceManager;
 public class MainActivity extends FragmentActivity {
 
     private static final String TAG = "MainActivity";
-    private static final int NUM_FRAGMENTS = 5;
-    private static final int START_INDEX   = 1;
-    private static final int PREF_INDEX    = 0;
-    private static final int MAP_INDEX     = 1;
-    private static final int BT_INDEX      = 2;
-    private static final int BLE_INDEX     = 3;
-    private static final int NFC_INDEX     = 4;
+    public  static final int NUM_FRAGMENTS = 5;
+    public  static final int PREF_INDEX    = 0;
+    public  static final int MAP_INDEX     = 1;
+    public  static final int BT_INDEX      = 2;
+    public  static final int BLE_INDEX     = 3;
+    public  static final int NFC_INDEX     = 4;
 
     PagerAdapter pagerAdapter;
     FragmentViewPager viewPager;
@@ -51,7 +51,8 @@ public class MainActivity extends FragmentActivity {
         pagerAdapter = new PagerAdapter(getFragmentManager());
         viewPager = (FragmentViewPager) findViewById(R.id.fragment_pager);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setCurrentItem(START_INDEX);
+        viewPager.setCurrentItem(MAP_INDEX);
+        viewPager.addOnPageChangeListener(new FragmentViewPager.OnPageChangeListener());
 
         // Request permission for fine location if it is not already granted
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
