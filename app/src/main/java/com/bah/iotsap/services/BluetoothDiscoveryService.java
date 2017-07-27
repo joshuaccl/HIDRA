@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.bah.iotsap.App;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
@@ -48,6 +49,7 @@ public class BluetoothDiscoveryService extends Service {
 
     private LocationDiscovery mLocationDiscovery;
     private Context mContext;
+    private int id = App.ID;
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -63,20 +65,24 @@ public class BluetoothDiscoveryService extends Service {
                 String deviceMac  = device.getAddress();
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                String time = date.substring(8);
+                date = date.substring(0,7);
                 Location location = mLocationDiscovery.getLocation();
 
-                // Send information in local broadcast using JSON format
                 try {
                     JSONObject item = new JSONObject();
                     item.put("date", date);
-                    item.put("mac",  deviceMac);
+                    item.put("time", time);
+                    item.put("mac", deviceMac);
                     item.put("name", deviceName);
-                    item.put("rssi", rssi);
                     if(location != null) {
                         item.put("latitude", location.getLatitude());
                         item.put("longitude", location.getLongitude());
                         item.put("altitude", location.getAltitude());
                     }
+                    item.put("id",id);
+                    item.put("rssi",rssi);
+                    item.put("type", "BT");
                     Log.i(TAG, item.toString());
 
                     FileRW.append(mContext, "bt", item.toString());

@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.bah.iotsap.App;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
@@ -20,8 +21,10 @@ import com.estimote.coresdk.recognition.packets.Beacon;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,6 +44,8 @@ public class BeaconDiscoveryService extends Service {
     private BeaconRegion beacons;
     private LocationDiscovery mLocationDiscovery;
     private Context mContext;
+
+    private int id = App.ID;
 
 
     public BeaconDiscoveryService() {
@@ -73,27 +78,31 @@ public class BeaconDiscoveryService extends Service {
                     for (Beacon beacon : rangedBeacons) {
                         beaconArrayList.add(beacon);
                         final String deviceName = ("iBeacon: " + beacon.getUniqueKey());
-                        final MacAddress macAddress = beacon.getMacAddress();
-                        final Calendar time = Calendar.getInstance();
-                        final String timeStamp = time.getTime().toString();
+                        final MacAddress deviceMac = beacon.getMacAddress();
+                        String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                         final Integer rssi = beacon.getRssi();
                         final Location location = mLocationDiscovery.getLocation();
+                        String time = date.substring(8);
+                        date = date.substring(0,7);
 
                         try {
-                            JSONObject info = new JSONObject();
-                            info.put("date", timeStamp);
-                            info.put("mac", macAddress);
-                            info.put("name", deviceName);
-                            info.put("rssi", rssi);
+                            JSONObject item = new JSONObject();
+                            item.put("date", date);
+                            item.put("time", time);
+                            item.put("mac", deviceMac);
+                            item.put("name", deviceName);
                             if(location != null) {
-                                info.put("latitude", location.getLatitude());
-                                info.put("longitude", location.getLongitude());
-                                info.put("altitude", location.getAltitude());
+                                item.put("latitude", location.getLatitude());
+                                item.put("longitude", location.getLongitude());
+                                item.put("altitude", location.getAltitude());
                             }
-                            Log.d("Service:", info.toString());
+                            item.put("id",id);
+                            item.put("rssi",rssi);
+                            item.put("type", "BEACON");
+                            Log.d("Service:", item.toString());
 
-                            FileRW.append(mContext, "beacon", info.toString());
-                            sendMessageToActivity(info.toString());
+                            FileRW.append(mContext, "beacon", item.toString());
+                            sendMessageToActivity(item.toString());
                         } catch (JSONException e) {
 
                         }

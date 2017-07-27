@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.bah.iotsap.App;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
@@ -56,6 +57,7 @@ public class BleDiscoveryService extends Service {
     private long delay;                     // Time to wait after a scan before restarting
     private LocationDiscovery mLocationDiscovery; //Location class for getting the location
     private Context mContext;
+    private int id = App.ID;
 
     private final Runnable stopper = new Runnable() {
         @Override
@@ -149,22 +151,29 @@ public class BleDiscoveryService extends Service {
 
             BluetoothDevice device = result.getDevice();
             String deviceName = device.getName();
+            if(deviceName==null) deviceName = "Unknown Device";
             String deviceMac  = device.getAddress();
             int    rssi       = result.getRssi();
             String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String time = date.substring(8);
+            date = date.substring(0,7);
             Location location = mLocationDiscovery.getLocation();
 
             try {
                 JSONObject item = new JSONObject();
                 item.put("date", date);
+                item.put("time", time);
                 item.put("mac", deviceMac);
                 item.put("name", deviceName);
-                item.put("rssi", rssi);
                 if(location != null) {
                     item.put("latitude", location.getLatitude());
                     item.put("longitude", location.getLongitude());
                     item.put("altitude", location.getAltitude());
                 }
+                item.put("id",id);
+                item.put("rssi",rssi);
+                item.put("type", "BLE");
+
                 Log.d(TAG, "ScanCallback(): json = " + item.toString());
 
                 FileRW.append(mContext, "ble", item.toString());
