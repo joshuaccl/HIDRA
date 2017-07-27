@@ -13,7 +13,7 @@ public final class SQLDB {
 
     //Define Table Contents
     public static class DataTypes implements BaseColumns {
-        public static final String TABLE_NAME = "devices";
+        public static String TABLE_NAME;
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_TIME = "time";
         public static final String COLUMN_TARGET_ID = "mac";
