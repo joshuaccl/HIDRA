@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -25,13 +26,16 @@ import com.bah.iotsap.App;
 import com.bah.iotsap.SQLDB;
 import com.bah.iotsap.SQLDBHelper;
 
+import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +69,8 @@ public class BleDiscoveryService extends Service {
     private LocationDiscovery mLocationDiscovery; //Location class for getting the location
     private Context mContext;
 
+    private ArrayList rows;
+
     private int id = App.ID;
 
     private SQLDBHelper mSQLDBHelper;
@@ -94,10 +100,14 @@ public class BleDiscoveryService extends Service {
 
         mContext = this;
 
+        rows = new ArrayList<>();
+
         mSQLDBHelper = new SQLDBHelper(mContext);
 
         //Gets the data repository in write mode
         db = mSQLDBHelper.getWritableDatabase();
+
+        SQLDB.DataTypes.TABLE_NAME = "ble";
 
         // Initial instantiation with default values
         bleAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -201,7 +211,9 @@ public class BleDiscoveryService extends Service {
                 Log.i(TAG, "ScanCallback(): caught JSON exception");
             }
 
-            ContentValues contentValues = new ContentValues();
+            ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "ble");
+            long newRowId= db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+            rows.add(newRowId);
         }
 
         @Override

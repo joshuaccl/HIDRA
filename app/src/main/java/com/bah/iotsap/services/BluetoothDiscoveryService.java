@@ -5,10 +5,12 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +18,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.bah.iotsap.App;
+import com.bah.iotsap.SQLDB;
+import com.bah.iotsap.SQLDBHelper;
+import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
@@ -24,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -50,6 +56,12 @@ public class BluetoothDiscoveryService extends Service {
     private LocationDiscovery mLocationDiscovery;
     private Context mContext;
     private int id = App.ID;
+
+    private ArrayList rows;
+
+    private SQLDBHelper mSQLDBHelper;
+    SQLiteDatabase db;
+
 
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -93,6 +105,10 @@ public class BluetoothDiscoveryService extends Service {
                     Log.i(TAG, "onReceive(): Caught JSON Exception");
                 }
 
+                ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "bt");
+                long newRowId= db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+                rows.add(newRowId);
+
             } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "onReceive(): Restarting BT discovery");
                 btAdapter.startDiscovery();
@@ -118,6 +134,11 @@ public class BluetoothDiscoveryService extends Service {
         mContext = this;
 
         FileRW.init(mContext,"bt");
+
+        rows = new ArrayList();
+        mSQLDBHelper = new SQLDBHelper(mContext);
+        db = mSQLDBHelper.getWritableDatabase();
+        SQLDB.DataTypes.TABLE_NAME = "bt";
 
         // Bluetooth discovery setup
         IntentFilter filter = new IntentFilter();
