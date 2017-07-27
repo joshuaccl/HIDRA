@@ -4,9 +4,12 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -21,35 +24,60 @@ public class MapFragment extends Fragment {
     private static final String TAG = "MapFragment";
 
     private MapView mapView;
-    private Button moreBtn;     // Button to slide left linear layout down
-    private Button nfcBtn;      // Transition to NFC fragment
-    private Button rfidBtn;     // Transition to RFID fragment
-    private Button prefBtn;     // Transition to preferences fragment
-    private boolean moreBtnClicked = false;
-
+    private ImageButton moreBtn;
+    private Button selfBtn;
+    private Button stylBtn;
+    private Button filtBtn;
+    private Button updtBtn;
     private View.OnClickListener moreBtnListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "moreBtn clicked");
+            Log.i(TAG, "more onClick()");
+            PopupMenu menu = new PopupMenu(getActivity().getApplicationContext(), moreBtn);
+            menu.getMenuInflater().inflate(R.menu.more_dropdown_menu, menu.getMenu());
+            menu.setOnMenuItemClickListener(menuItemClickListener);
+            menu.show();
         }
     };
-    private View.OnClickListener nfcBtnListener = new View.OnClickListener() {
+    private View.OnClickListener selfBtnListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "nfcBtn clicked");
+            Log.i(TAG, "self onClick()");
         }
     };
-    private View.OnClickListener rfidBtnListener = new View.OnClickListener() {
+    private View.OnClickListener stylBtnListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "rfidBtn clicked");
+            Log.i(TAG, "styl onClick()");
         }
     };
-    private View.OnClickListener prefBtnListener = new View.OnClickListener() {
+    private View.OnClickListener filtBtnListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.i(TAG, "prefBtn clicked");
-            ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.PREF_INDEX);
+            Log.i(TAG, "filt onClick()");
+        }
+    };
+    private View.OnClickListener updtBtnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.i(TAG, "updt onClick()");
+        }
+    };
+    private PopupMenu.OnMenuItemClickListener menuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Log.i(TAG, "onMenuItemClick(MenuItem): title = " + item.getTitle());
+
+            if(getResources().getString(R.string.dropdown_item_nfc).equals(item.getTitle())) {
+                Log.i(TAG, "onMenuItemClick(MenuItem): NFC ACTION");
+                ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.NFC_INDEX);
+            } else if(getResources().getString(R.string.dropdown_item_rfid).equals(item.getTitle())) {
+                Log.i(TAG, "onMenuItemClick(MenuItem): RFID ACTION");
+            } else if(getResources().getString(R.string.dropdown_item_pref).equals(item.getTitle())) {
+                Log.i(TAG, "onMenuItemClick(MenuItem): PREF ACTION");
+                ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.PREF_INDEX);
+            }
+            return true;
         }
     };
 
@@ -62,17 +90,22 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView()");
         View fragmentLayout = inflater.inflate(R.layout.fragment_map, container, false);
+
+        // UI setup
+        moreBtn = (ImageButton) fragmentLayout.findViewById(R.id.map_top_linear_more_btn);
+        selfBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_self_btn);
+        stylBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_styl_btn);
+        filtBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_filt_btn);
+        updtBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_updt_btn);
+        moreBtn.setOnClickListener(moreBtnListener);
+        selfBtn.setOnClickListener(selfBtnListener);
+        stylBtn.setOnClickListener(stylBtnListener);
+        filtBtn.setOnClickListener(filtBtnListener);
+        updtBtn.setOnClickListener(updtBtnListener);
+
+        // MapView setup
         mapView = (MapView) fragmentLayout.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-
-        moreBtn = (Button) fragmentLayout.findViewById(R.id.map_left_more_button);
-        nfcBtn  = (Button) fragmentLayout.findViewById(R.id.map_left_nfc_button);
-        rfidBtn = (Button) fragmentLayout.findViewById(R.id.map_left_rfid_button);
-        prefBtn = (Button) fragmentLayout.findViewById(R.id.map_left_pref_button);
-        moreBtn.setOnClickListener(moreBtnListener);
-        nfcBtn .setOnClickListener(nfcBtnListener);
-        rfidBtn.setOnClickListener(rfidBtnListener);
-        prefBtn.setOnClickListener(prefBtnListener);
         return fragmentLayout;
     }
 

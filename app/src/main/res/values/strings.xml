@@ -16,4 +16,8 @@
 
     <!-- UI strings -->
     <string name="vertical_ellipsis">&#8942;</string>
+    <!-- MapFragment more dropdown menu strings -->
+    <string name="dropdown_item_nfc">NFC</string>
+    <string name="dropdown_item_rfid">RFID</string>
+    <string name="dropdown_item_pref">Preferences</string>
 </resources>

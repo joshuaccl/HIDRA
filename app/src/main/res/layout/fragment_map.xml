@@ -15,60 +15,61 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <!-- Linear layout to hold the dropdown menu icons -->
-        <LinearLayout
-            android:id="@+id/map_left_linear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="start|top"
-            android:background="@drawable/maplinearlayoutborder">
-            <Button
-                android:id="@+id/map_left_pref_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="PREF"/>
-            <Button
-                android:id="@+id/map_left_rfid_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="RFID"/>
-            <Button
-                android:id="@+id/map_left_nfc_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="NFC"/>
-            <Button
-                android:id="@+id/map_left_more_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/vertical_ellipsis" />
-        </LinearLayout>
-
         <!-- Linear layout to hold the top bar of map item options -->
         <LinearLayout
             android:id="@+id/map_top_linear"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="start|top"
-            android:background="@drawable/maplinearlayoutborder">
-            <Button
+            android:layout_gravity="top"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:background="@color/transparent_dark">
+            <ImageButton
+                android:id="@+id/map_top_linear_more_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TEST1"/>
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:src="@drawable/ic_more_vert_black_24px"/>
             <Button
+                android:id="@+id/map_top_linear_self_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TEST2"/>
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="SELF" />
             <Button
+                android:id="@+id/map_top_linear_styl_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TEST3"/>
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="STYL"/>
             <Button
+                android:id="@+id/map_top_linear_filt_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TEST4"/>
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="FILT"/>
+            <Button
+                android:id="@+id/map_top_linear_updt_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/topbar_item_text_size"
+                android:background="@android:color/transparent"
+                android:paddingLeft="@dimen/topbar_item_padding"
+                android:paddingRight="@dimen/topbar_item_padding"
+                android:text="UPDT"/>
+
         </LinearLayout>
 
     </LinearLayout>
