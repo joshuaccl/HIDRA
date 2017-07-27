@@ -83,7 +83,7 @@ public class BeaconDiscoveryService extends Service {
                         final Integer rssi = beacon.getRssi();
                         final Location location = mLocationDiscovery.getLocation();
                         String time = date.substring(8);
-                        date = date.substring(0,7);
+                        date = date.substring(0,8);
 
                         try {
                             JSONObject item = new JSONObject();

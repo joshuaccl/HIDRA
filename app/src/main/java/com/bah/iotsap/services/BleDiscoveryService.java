@@ -156,7 +156,7 @@ public class BleDiscoveryService extends Service {
             int    rssi       = result.getRssi();
             String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
             String time = date.substring(8);
-            date = date.substring(0,7);
+            date = date.substring(0,8);
             Location location = mLocationDiscovery.getLocation();
 
             try {

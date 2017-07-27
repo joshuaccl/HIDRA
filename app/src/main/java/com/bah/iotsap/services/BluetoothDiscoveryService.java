@@ -66,7 +66,7 @@ public class BluetoothDiscoveryService extends Service {
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                 String time = date.substring(8);
-                date = date.substring(0,7);
+                date = date.substring(0,8);
                 Location location = mLocationDiscovery.getLocation();
 
                 try {
