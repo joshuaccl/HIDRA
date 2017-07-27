@@ -3,6 +3,8 @@
 
     <!-- Mapbox strings -->
     <string name="mapbox_token">pk.eyJ1Ijoic2FyYWJhaCIsImEiOiJjajN1aW5zMzkwMTZwMnhueDJydnp2YmQ4In0.-SlPyNG0SB7viKcqy5c9KQ</string>
+    <string name="mapbox_location_permission_explanation">This app needs location permissions in order to place current location on map.</string>
+    <string name="mapbox_location_permission_denied">We require location permissions in order to function.</string>
 
     <!-- Preferences TEXT strings (NOT KEYS) -->
     <string name="pref_text_bluetooth_service">Bluetooth background search service</string>

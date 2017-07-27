@@ -148,6 +148,7 @@ public class BleDiscoveryService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy()");
+        leScanner.stopScan(leScanCallback);
         handler.removeCallbacks(stopper);
         handler.removeCallbacks(starter);
         Log.i(TAG, "onDestroy(): removed callbacks");
