@@ -17,7 +17,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
-        Mapbox.getInstance(getApplicationContext(), getResources().getString(R.string.mapbox_token));
+        Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_token));
         Log.i(TAG, "onCreate(): Got mapbox instance");
     }
 }
