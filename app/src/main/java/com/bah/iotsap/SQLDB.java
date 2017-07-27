@@ -26,7 +26,7 @@ public final class SQLDB {
         public static final String COLUMN_TYPE = "type";
     }
 
-    private static final String SQL_CREATE_ENTRIES =
+    public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + DataTypes.TABLE_NAME + " (" +
                     DataTypes._ID + " INTEGER PRIMARY KEY," +
                     DataTypes.COLUMN_DATE + " TEXT," +
@@ -40,7 +40,7 @@ public final class SQLDB {
                     DataTypes.COLUMN_RSSI + " TEXT," +
                     DataTypes.COLUMN_TYPE + " TEXT)";
 
-    private static final String SQL_DELETE_ENTRIES =
+    public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + DataTypes.TABLE_NAME;
 
 

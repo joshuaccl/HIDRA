@@ -7,9 +7,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,7 +19,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+
 import com.bah.iotsap.App;
+
+import com.bah.iotsap.SQLDB;
+import com.bah.iotsap.SQLDBHelper;
+
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
 
@@ -57,7 +64,12 @@ public class BleDiscoveryService extends Service {
     private long delay;                     // Time to wait after a scan before restarting
     private LocationDiscovery mLocationDiscovery; //Location class for getting the location
     private Context mContext;
+
     private int id = App.ID;
+
+    private SQLDBHelper mSQLDBHelper;
+    SQLiteDatabase db;
+
 
     private final Runnable stopper = new Runnable() {
         @Override
@@ -81,6 +93,11 @@ public class BleDiscoveryService extends Service {
         Log.i(TAG, "onCreate()");
 
         mContext = this;
+
+        mSQLDBHelper = new SQLDBHelper(mContext);
+
+        //Gets the data repository in write mode
+        db = mSQLDBHelper.getWritableDatabase();
 
         // Initial instantiation with default values
         bleAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -184,6 +201,8 @@ public class BleDiscoveryService extends Service {
             } catch(JSONException e) {
                 Log.i(TAG, "ScanCallback(): caught JSON exception");
             }
+
+            ContentValues contentValues = new ContentValues();
         }
 
         @Override
