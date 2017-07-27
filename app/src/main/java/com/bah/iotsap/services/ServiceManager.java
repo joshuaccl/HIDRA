@@ -102,6 +102,9 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
                         getApplicationContext(), BeaconDiscoveryService.class));
             }
 
+            // Start SendFileService
+            startService(new Intent(getApplicationContext(), SendFileService.class));
+
         } else if(intent != null && intent.getAction().equals(STOP)) {
             Log.i(TAG, "onStartCommand(): intent action = STOP");
 
@@ -117,6 +120,7 @@ public class ServiceManager extends Service implements SharedPreferences.OnShare
                 Log.i(TAG, "onStartCommand(): Stopping Beacon Service");
                 stopService(new Intent(getApplicationContext(), BeaconDiscoveryService.class));
             }
+            stopService(new Intent(getApplicationContext(), SendFileService.class));
             Log.i(TAG, "onStartCommand(): Stopping Self");
             stopSelf();
         }

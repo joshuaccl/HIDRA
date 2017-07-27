@@ -7,21 +7,22 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bah.iotsap.util.FileRW;
 
 public class SendFileService extends Service {
 
+    private static final String TAG = "SendFileService";
+    private final int PERIODIC_EVENT_TIMEOUT = 30000;
+
     private Handler mHandler;
     private Context mContext;
 
-    private final int PERIODIC_EVENT_TIMEOUT = 30000;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("SendFileService: " , "OnCreate()");
+        Log.i(TAG, "OnCreate()");
         mContext = this;
         mHandler = new Handler();
         mHandler.postDelayed(sendFiles, PERIODIC_EVENT_TIMEOUT);
@@ -34,35 +35,35 @@ public class SendFileService extends Service {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
+                    Log.i(TAG, "run: Starting HttpService for BT");
                     Intent bt = new Intent(HttpService.SEND_FILE, null,
                             getApplicationContext(), HttpService.class);
                     bt.putExtra("title", "bt");
-
                     startService(bt);
-
-                    LocalBroadcastManager.getInstance(SendFileService.this).sendBroadcast(bt);                }
+                    LocalBroadcastManager.getInstance(SendFileService.this).sendBroadcast(bt);
+                }
             }, 5000);
 
             handler.postDelayed(new Runnable() {
                 public void run() {
+                    Log.i(TAG, "run: Starting HttpService for BLE");
                     Intent ble = new Intent(HttpService.SEND_FILE, null,
                             getApplicationContext(), HttpService.class);
                     ble.putExtra("title", "ble");
-
                     startService(ble);
-
-                    LocalBroadcastManager.getInstance(SendFileService.this).sendBroadcast(ble);                }
+                    LocalBroadcastManager.getInstance(SendFileService.this).sendBroadcast(ble);
+                }
             }, 15000);
 
             handler.postDelayed(new Runnable() {
                 public void run() {
+                    Log.i(TAG, "run: Starting HttpService for BEACON");
                     Intent beacon = new Intent(HttpService.SEND_FILE, null,
                             getApplicationContext(), HttpService.class);
                     beacon.putExtra("title", "beacon");
-
                     startService(beacon);
-
-                    LocalBroadcastManager.getInstance(SendFileService.this).sendBroadcast(beacon);                }
+                    LocalBroadcastManager.getInstance(SendFileService.this).sendBroadcast(beacon);
+                }
             }, 25000);
 
 //            Intent nfc = new Intent(HttpService.SEND_FILE, null,
@@ -82,18 +83,16 @@ public class SendFileService extends Service {
             FileRW.delete(mContext, "beacon");
             FileRW.init(mContext, "beacon");
 
-            Toast.makeText(SendFileService.this, "30 seconds have passed", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "30 seconds have passed");
             mHandler.postDelayed(sendFiles, PERIODIC_EVENT_TIMEOUT);
         }
     };
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "onDestroy()");
         mHandler.removeCallbacks(sendFiles);
         super.onDestroy();
-    }
-
-    public SendFileService() {
     }
 
     @Override

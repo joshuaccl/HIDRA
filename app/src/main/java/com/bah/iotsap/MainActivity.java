@@ -16,8 +16,6 @@ import android.util.SparseArray;
 import com.bah.iotsap.services.BeaconDiscoveryService;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
-import com.bah.iotsap.services.HttpService;
-import com.bah.iotsap.services.SendFileService;
 import com.bah.iotsap.services.ServiceManager;
 
 /**
@@ -70,14 +68,12 @@ public class MainActivity extends FragmentActivity {
     protected void onDestroy() {
         Log.i(TAG, "onDestroy(): stopping ServiceManager");
         startService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
-        stopService(new Intent(this, SendFileService.class));
         super.onDestroy();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        startService(new Intent(this, SendFileService.class));
     }
 
     /**
