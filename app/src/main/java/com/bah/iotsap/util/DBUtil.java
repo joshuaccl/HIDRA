@@ -13,7 +13,9 @@ import com.bah.iotsap.SQLDB;
 
 public class DBUtil {
 
+
     //returns a ContentValues object to later insert into the database
+
     public static ContentValues insert(String date, String time, String deviceMac, String deviceName,
                                        Location location, int id, int rssi, String type) {
         ContentValues contentValues = new ContentValues();
