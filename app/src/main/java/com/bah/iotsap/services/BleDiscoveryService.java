@@ -152,6 +152,7 @@ public class BleDiscoveryService extends Service {
         handler.removeCallbacks(stopper);
         handler.removeCallbacks(starter);
         Log.i(TAG, "onDestroy(): removed callbacks");
+        mSQLDBHelper.close();
     }
 
     private void scanLeDevice(final boolean isScanning) {
@@ -212,6 +213,7 @@ public class BleDiscoveryService extends Service {
                 Log.i(TAG, "ScanCallback(): caught JSON exception");
             }
 
+            //Insert new data into database
             ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "ble");
             long newRowId= db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
             rows.add(newRowId);

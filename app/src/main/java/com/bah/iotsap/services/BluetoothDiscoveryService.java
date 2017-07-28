@@ -181,6 +181,7 @@ public class BluetoothDiscoveryService extends Service {
         super.onDestroy();
         Log.i(TAG, "onDestroy()");
         unregisterReceiver(receiver);
+        mSQLDBHelper.close();
     }
 
     /**

@@ -24,6 +24,7 @@ public final class SQLDB {
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_RSSI = "rssi";
         public static final String COLUMN_TYPE = "type";
+        public static final String COLUMN_NEW = "new";
     }
 
     public static final String SQL_CREATE_ENTRIES =
@@ -38,11 +39,9 @@ public final class SQLDB {
                     DataTypes.COLUMN_ALT + " TEXT," +
                     DataTypes.COLUMN_ID + " TEXT," +
                     DataTypes.COLUMN_RSSI + " TEXT," +
-                    DataTypes.COLUMN_TYPE + " TEXT)";
+                    DataTypes.COLUMN_TYPE + " TEXT," +
+                    DataTypes.COLUMN_NEW + "TEXT)";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + DataTypes.TABLE_NAME;
-
-
-
 }

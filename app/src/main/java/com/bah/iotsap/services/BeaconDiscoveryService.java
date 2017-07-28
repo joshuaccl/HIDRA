@@ -272,6 +272,7 @@ public class BeaconDiscoveryService extends Service {
         connectionProvider.destroy();
         beaconArrayList.clear();
         super.onDestroy();
+        mSQLDBHelper.close();
     }
 
     @Override
