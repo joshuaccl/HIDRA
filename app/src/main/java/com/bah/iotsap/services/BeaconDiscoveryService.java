@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.IBinder;
 
@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.bah.iotsap.App;
 import com.bah.iotsap.SQLDB;
-import com.bah.iotsap.SQLDBHelper;
 import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
@@ -26,10 +25,8 @@ import com.estimote.coresdk.recognition.packets.Beacon;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -55,10 +52,6 @@ public class BeaconDiscoveryService extends Service {
 
     private ArrayList rows;
 
-    private SQLDBHelper mSQLDBHelper;
-    SQLiteDatabase db;
-
-
     public BeaconDiscoveryService() {
     }
 
@@ -74,12 +67,6 @@ public class BeaconDiscoveryService extends Service {
         mContext = this;
 
         rows = new ArrayList();
-
-        mSQLDBHelper = new SQLDBHelper(mContext);
-
-        db = mSQLDBHelper.getWritableDatabase();
-
-        SQLDB.DataTypes.TABLE_NAME = "beacon";
 
         FileRW.init(mContext,"beacon");
 
@@ -129,8 +116,16 @@ public class BeaconDiscoveryService extends Service {
                         ContentValues contentValues =
                                 DBUtil.insert(date, time, deviceMac.toString(),
                                         deviceName, location, id, rssi, "beacon");
-                        long newRowId = db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+                        long newRowId = App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+
                         rows.add(newRowId);
+
+                        Cursor cursor = DBUtil.read(App.db,SQLDB.DataTypes.TABLE_NAME);
+                        while(cursor.moveToNext()) {
+                            String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
+                            Log.i("BEACON DATABASE: " , mac);
+                        }
+                        cursor.close();
                     }
                 }
             }
@@ -272,7 +267,6 @@ public class BeaconDiscoveryService extends Service {
         connectionProvider.destroy();
         beaconArrayList.clear();
         super.onDestroy();
-        mSQLDBHelper.close();
     }
 
     @Override

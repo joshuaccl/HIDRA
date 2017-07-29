@@ -19,17 +19,19 @@ public class DBUtil {
     public static ContentValues insert(String date, String time, String deviceMac, String deviceName,
                                        Location location, int id, int rssi, String type) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(SQLDB.DataTypes.COLUMN_DATE, date);
-        contentValues.put(SQLDB.DataTypes.COLUMN_TIME, time);
-        contentValues.put(SQLDB.DataTypes.COLUMN_TARGET_ID, deviceMac);
-        contentValues.put(SQLDB.DataTypes.COLUMN_NAME, deviceName);
-        contentValues.put(SQLDB.DataTypes.COLUMN_LAT, location.getLatitude());
-        contentValues.put(SQLDB.DataTypes.COLUMN_LON, location.getLongitude());
-        contentValues.put(SQLDB.DataTypes.COLUMN_ALT, location.getAltitude());
-        contentValues.put(SQLDB.DataTypes.COLUMN_ID, id);
-        contentValues.put(SQLDB.DataTypes.COLUMN_RSSI, rssi);
-        contentValues.put(SQLDB.DataTypes.COLUMN_TYPE, type);
-        contentValues.put(SQLDB.DataTypes.COLUMN_NEW, "new");
+        contentValues.put("date", date);
+        contentValues.put("time", time);
+        contentValues.put("mac", deviceMac);
+        contentValues.put("name", deviceName);
+        if(location!=null) {
+            contentValues.put("latitude", location.getLatitude());
+            contentValues.put("longitude", location.getLongitude());
+            contentValues.put("altitude", location.getAltitude());
+        }
+        contentValues.put("id", id);
+        contentValues.put("rssi", rssi);
+        contentValues.put("type", type);
+        contentValues.put("new", "new");
         return contentValues;
     }
 

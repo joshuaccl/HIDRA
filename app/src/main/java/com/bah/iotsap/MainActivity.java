@@ -16,6 +16,7 @@ import android.util.SparseArray;
 import com.bah.iotsap.services.BeaconDiscoveryService;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
+import com.bah.iotsap.services.SendFileService;
 import com.bah.iotsap.services.ServiceManager;
 
 /**
@@ -68,6 +69,9 @@ public class MainActivity extends FragmentActivity {
     protected void onDestroy() {
         Log.i(TAG, "onDestroy(): stopping ServiceManager");
         startService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
+        stopService(new Intent(this, SendFileService.class));
+        App.mSQLDBHelper.close();
+        App.db.execSQL(SQLDB.SQL_DELETE_ENTRIES);
         super.onDestroy();
     }
 

@@ -1,6 +1,7 @@
 package com.bah.iotsap;
 
 import android.app.Application;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.mapbox.mapboxsdk.Mapbox;
@@ -15,6 +16,8 @@ public class App extends Application {
 
     private static final String TAG = "Application";
     public static int ID;
+    public static SQLDBHelper mSQLDBHelper;
+    public static SQLiteDatabase db;
 
     @Override
     public void onCreate() {
@@ -25,5 +28,9 @@ public class App extends Application {
         Random rand = new Random();
         ID = rand.nextInt(500) + 1;
         ID = ID * (rand.nextInt(500) + 1);
+
+        mSQLDBHelper = new SQLDBHelper(this);
+
+        db = mSQLDBHelper.getWritableDatabase();
     }
 }

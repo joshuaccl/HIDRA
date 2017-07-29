@@ -11,11 +11,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -24,8 +23,6 @@ import android.util.Log;
 import com.bah.iotsap.App;
 
 import com.bah.iotsap.SQLDB;
-import com.bah.iotsap.SQLDBHelper;
-
 import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
@@ -33,7 +30,6 @@ import com.bah.iotsap.util.LocationDiscovery;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,10 +69,6 @@ public class BleDiscoveryService extends Service {
 
     private int id = App.ID;
 
-    private SQLDBHelper mSQLDBHelper;
-    SQLiteDatabase db;
-
-
     private final Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -101,13 +93,6 @@ public class BleDiscoveryService extends Service {
         mContext = this;
 
         rows = new ArrayList<>();
-
-        mSQLDBHelper = new SQLDBHelper(mContext);
-
-        //Gets the data repository in write mode
-        db = mSQLDBHelper.getWritableDatabase();
-
-        SQLDB.DataTypes.TABLE_NAME = "ble";
 
         // Initial instantiation with default values
         bleAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -152,7 +137,6 @@ public class BleDiscoveryService extends Service {
         handler.removeCallbacks(stopper);
         handler.removeCallbacks(starter);
         Log.i(TAG, "onDestroy(): removed callbacks");
-        mSQLDBHelper.close();
     }
 
     private void scanLeDevice(final boolean isScanning) {
@@ -215,8 +199,15 @@ public class BleDiscoveryService extends Service {
 
             //Insert new data into database
             ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "ble");
-            long newRowId= db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+            long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
             rows.add(newRowId);
+
+            Cursor cursor = DBUtil.read(App.db, SQLDB.DataTypes.TABLE_NAME);
+            while(cursor.moveToNext()) {
+                String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
+                Log.i("BLE DATABASE: " , mac);
+            }
+            cursor.close();
         }
 
         @Override

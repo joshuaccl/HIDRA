@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.IBinder;
@@ -59,10 +60,6 @@ public class BluetoothDiscoveryService extends Service {
 
     private ArrayList rows;
 
-    private SQLDBHelper mSQLDBHelper;
-    SQLiteDatabase db;
-
-
     private final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -106,8 +103,15 @@ public class BluetoothDiscoveryService extends Service {
                 }
 
                 ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "bt");
-                long newRowId= db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+                long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
                 rows.add(newRowId);
+
+                Cursor cursor = DBUtil.read(App.db,SQLDB.DataTypes.TABLE_NAME);
+                while(cursor.moveToNext()) {
+                    String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
+                    Log.i("BT DATABASE: " , mac);
+                }
+                cursor.close();
 
             } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "onReceive(): Restarting BT discovery");
@@ -136,9 +140,6 @@ public class BluetoothDiscoveryService extends Service {
         FileRW.init(mContext,"bt");
 
         rows = new ArrayList();
-        mSQLDBHelper = new SQLDBHelper(mContext);
-        db = mSQLDBHelper.getWritableDatabase();
-        SQLDB.DataTypes.TABLE_NAME = "bt";
 
         // Bluetooth discovery setup
         IntentFilter filter = new IntentFilter();
@@ -181,7 +182,6 @@ public class BluetoothDiscoveryService extends Service {
         super.onDestroy();
         Log.i(TAG, "onDestroy()");
         unregisterReceiver(receiver);
-        mSQLDBHelper.close();
     }
 
     /**

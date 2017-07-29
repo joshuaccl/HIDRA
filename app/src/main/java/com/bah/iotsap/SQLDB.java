@@ -3,7 +3,7 @@ package com.bah.iotsap;
 import android.provider.BaseColumns;
 
 /**
- * Created by 591263 on 7/26/2017.
+ * Created by 591263 on 7/28/2017.
  */
 
 public final class SQLDB {
@@ -13,7 +13,7 @@ public final class SQLDB {
 
     //Define Table Contents
     public static class DataTypes implements BaseColumns {
-        public static String TABLE_NAME;
+        public static final String TABLE_NAME = "bt";
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_TIME = "time";
         public static final String COLUMN_TARGET_ID = "mac";
@@ -40,7 +40,7 @@ public final class SQLDB {
                     DataTypes.COLUMN_ID + " TEXT," +
                     DataTypes.COLUMN_RSSI + " TEXT," +
                     DataTypes.COLUMN_TYPE + " TEXT," +
-                    DataTypes.COLUMN_NEW + "TEXT)";
+                    DataTypes.COLUMN_NEW + " TEXT)";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + DataTypes.TABLE_NAME;
