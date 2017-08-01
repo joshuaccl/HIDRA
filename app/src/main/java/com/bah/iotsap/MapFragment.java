@@ -29,11 +29,26 @@ import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
+import com.mapbox.mapboxsdk.style.layers.Filter;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
+import com.mapbox.services.commons.geojson.Feature;
+import com.mapbox.services.commons.geojson.FeatureCollection;
+import com.mapbox.services.commons.geojson.LineString;
+import com.mapbox.services.commons.geojson.Point;
+import com.mapbox.services.commons.models.Position;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -86,8 +101,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 5000);
                 }
             });
-
-            // Add data points to map from remote source
             VectorSource vectorSource = new VectorSource(
                     "ethnicity-source",
                     "http://api.mapbox.com/v4/examples.8fgz4egr.json?access_token=" + Mapbox.getAccessToken()
@@ -117,6 +130,92 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     )
             );
             mapboxMap.addLayer(circleLayer);
+            Layer layer = mapboxMap.getLayer("sf2010");
+            if(layer == null) {
+                Log.i(TAG, "LAYER IS NULL");
+            } else {
+                Log.i(TAG, "LAYER IS NOT NULL");
+            }
+
+
+            // Mapbox LineLayer with GeoJson Example
+            List<Position> routeCoordinates = new ArrayList<>();
+            routeCoordinates.add(Position.fromCoordinates(-157.858333, 21.306944));
+            routeCoordinates.add(Position.fromCoordinates(-157.858333, 22.306944));
+
+            LineString lineString = LineString.fromCoordinates(routeCoordinates);
+            FeatureCollection collection =
+                    FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(lineString)});
+            Log.i(TAG, collection.toJson());
+            Source geoJsonSource = new GeoJsonSource("line-source", collection);
+            mapboxMap.addSource(geoJsonSource);
+
+            LineLayer lineLayer = new LineLayer("line-layer", "line-source");
+            lineLayer.setProperties(
+                    PropertyFactory.lineDasharray(new Float[]{0.01f, 2f}),
+                    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
+                    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
+                    PropertyFactory.lineWidth(5f),
+                    PropertyFactory.lineColor(Color.RED)
+            );
+            mapboxMap.addLayer(lineLayer);
+
+
+            // GEOJSON CIRCLE LAYER FROM URL TEST
+            try {
+                GeoJsonSource geoSource = new GeoJsonSource("earthquakes",
+                        new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
+                        new GeoJsonOptions()
+                            .withCluster(true)
+                            .withClusterMaxZoom(15)
+                            .withClusterRadius(20)
+                );
+                mapboxMap.addSource(geoSource);
+            } catch (MalformedURLException e) {
+                Log.i(TAG, "MalformedURLException", e);
+            }
+            CircleLayer unclustered = new CircleLayer("unclustered-points", "earthquakes");
+            unclustered.setProperties(
+                    PropertyFactory.circleColor(Color.parseColor("#FBB03B")),
+                    PropertyFactory.circleRadius(20f),
+                    PropertyFactory.circleBlur(1f)
+            );
+            unclustered.setFilter(Filter.neq("cluster", true));
+            mapboxMap.addLayerBelow(unclustered, "building");
+
+            // GEOJSON CIRCLE LAYER FROM COLLECTION TEST
+            // USE THIS EXAMPLE TO POPULATE MAP!!!! THIS WORKS!!
+            List<Feature> featList = new ArrayList<>();
+            Feature myFeat;
+
+            myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.858333, 21.306944}));
+            myFeat.addStringProperty("title", "Honolulu");
+            featList.add(myFeat);
+            myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.817, 21.297}));
+            myFeat.addStringProperty("title", "Manoa");
+            featList.add(myFeat);
+            FeatureCollection coll = FeatureCollection.fromFeatures(featList);
+            Log.i(TAG, coll.toJson());
+
+            GeoJsonSource mySource = new GeoJsonSource("testing", coll,
+                    new GeoJsonOptions()
+                        .withCluster(true)
+                        .withClusterMaxZoom(15)
+                        .withClusterRadius(20));
+            mapboxMap.addSource(mySource);
+            CircleLayer testLayer = new CircleLayer("test-layer", "testing");
+            testLayer.setProperties(
+                    PropertyFactory.circleColor(Function.property("title", Stops.categorical(
+                            Stop.stop("Honolulu", PropertyFactory.circleColor(Color.BLUE)),
+                            Stop.stop("Manoa", PropertyFactory.circleColor(Color.RED))
+                    ))),
+                    PropertyFactory.circleRadius(
+                            Function.zoom(Stops.exponential(
+                                    Stop.stop(12, PropertyFactory.circleRadius(5f)),
+                                    Stop.stop(22, PropertyFactory.circleRadius(180f))
+                            ).withBase(1.75f)))
+            );
+            mapboxMap.addLayerBelow(testLayer, "road");
         }
     };
     private View.OnClickListener moreBtnListener = new View.OnClickListener() {
@@ -254,6 +353,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
         super.onDestroy();
         mapView.onDestroy();
     }
+
 
     private void enableLocationTracking() {
         mapboxMap.setMyLocationEnabled(true);
