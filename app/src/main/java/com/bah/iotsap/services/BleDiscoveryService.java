@@ -11,7 +11,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
@@ -201,13 +200,6 @@ public class BleDiscoveryService extends Service {
             ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "ble");
             long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
             rows.add(newRowId);
-
-            Cursor cursor = DBUtil.queryBle(App.db);
-            while(cursor.moveToNext()) {
-                String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
-                Log.i("BLE DATABASE: " , mac);
-            }
-            cursor.close();
         }
 
         @Override

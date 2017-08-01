@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -104,13 +103,6 @@ public class BluetoothDiscoveryService extends Service {
                 ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "bt");
                 long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
                 rows.add(newRowId);
-
-                Cursor cursor = DBUtil.queryBt(App.db);
-                while(cursor.moveToNext()) {
-                    String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
-                    Log.i("BT DATABASE: " , mac);
-                }
-                cursor.close();
 
             } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "onReceive(): Restarting BT discovery");

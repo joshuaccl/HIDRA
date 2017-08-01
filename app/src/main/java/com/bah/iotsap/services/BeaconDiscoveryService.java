@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.location.Location;
 import android.os.IBinder;
 
@@ -119,59 +118,16 @@ public class BeaconDiscoveryService extends Service {
                         long newRowId = App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
 
                         rows.add(newRowId);
-
-                        Cursor cursor = DBUtil.queryBeacon(App.db);
-                        while(cursor.moveToNext()) {
-                            String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
-                            Log.i(TAG, mac);
-                        }
-                        cursor.close();
                     }
                 }
             }
         });
-
-
-
-//        beaconManager.setMonitoringListener(new BeaconManager.BeaconMonitoringListener() {
-//                                                @Override
-//                                                public void onEnteredRegion(BeaconRegion beaconRegion, List<Beacon> list) {
-//                                                        for (Beacon beacon : list) {
-//                                                            beaconArrayList.add(beacon);
-//                                                            final String deviceName = ("iBeacon: " + beacon.getUniqueKey());
-//                                                            final MacAddress macAddress = beacon.getMacAddress();
-//                                                            final Calendar time = Calendar.getInstance();
-//                                                            final String timeStamp = time.getTime().toString();
-//                                                            final Integer rssi = beacon.getRssi();
-//
-//                                                            try {
-//                                                            JSONObject info = new JSONObject();
-//                                                            info.put("date", timeStamp);
-//                                                            info.put("mac", macAddress);
-//                                                            info.put("name", deviceName);
-//                                                            info.put("rssi", rssi);
-//                                                            Log.d("Service:", info.toString());
-//                                                            sendMessageToActivity(info.toString());
-//                                                             } catch (JSONException e) {
-//
-//                                                         }
-//                                                        }
-//                                                }
-//
-//                                                @Override
-//                                                public void onExitedRegion(BeaconRegion beaconRegion) {
-//
-//                                                }
-//
-//                                            });
         connectionProvider = new DeviceConnectionProvider(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-//        beaconManager.setForegroundScanPeriod(2000,2000);
-//        beaconManager.setBackgroundScanPeriod(10000,5000);
         if(START.equals(intent.getAction())) {
             Log.i(TAG, "onStartCommand(): Entered START action");
 
@@ -179,80 +135,10 @@ public class BeaconDiscoveryService extends Service {
                 @Override
                 public void onServiceReady() {
                     beaconManager.setForegroundScanPeriod(5000, 5000);
-//                beaconManager.startRanging(new BeaconRegion(
-//                        "monitored region",
-//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-//                        47985, 43250
-//                ));
-//                beaconManager.startMonitoring(new BeaconRegion(
-//                        "monitored region",
-//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-//                        32436, 26381
-//                ));
                     beaconManager.startMonitoring(beacons);
                     beaconManager.startRanging(beacons);
                 }
             });
-
-//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-//                                  @Override
-//                                  public void onServiceReady() {
-//
-//                                      beaconManager.setConfigurableDevicesListener(new BeaconManager.ConfigurableDevicesListener() {
-//                                          @Override
-//                                          public void onConfigurableDevicesFound(List<ConfigurableDevice> configurableDevices) {
-//                                              for (ConfigurableDevice configurableDevice : configurableDevices) {
-//                                                  device = configurableDevice;
-//                                                  beaconArrayList.add(device);
-//                                                  final String deviceName = ("iBeacon: " + device.getUniqueKey());
-//                                                  final MacAddress macAddress = device.macAddress;
-//                                                  final Long time = device.discoveryTime;
-//                                                  final Integer rssi = device.rssi;
-//
-//                                                  try {
-//                                                      JSONObject info = new JSONObject();
-//                                                      info.put("date", time);
-//                                                      info.put("mac", macAddress);
-//                                                      info.put("name", deviceName);
-//                                                      info.put("rssi", rssi);
-//                                                      Log.d("Service:", info.toString());
-//                                                      sendMessageToActivity(info.toString());
-//                                                  } catch (JSONException e) {
-//
-//                                                  }
-//
-//                                                  connectionProvider.connectToService(new DeviceConnectionProvider.ConnectionProviderCallback() {
-//                                                      @Override
-//                                                      public void onConnectedToService() {
-//                                                          connection = connectionProvider.getConnection(device);
-//                                                          connection.connect(new DeviceConnectionCallback() {
-//                                                              @Override
-//                                                              public void onConnected() {
-//
-//                                                              }
-//
-//                                                              @Override
-//                                                              public void onDisconnected() {
-//                                                                  beaconArrayList.remove(device);
-//                                                                  Intent intent = new Intent("Lost");
-//                                                                  intent.putExtra("Device", device.macAddress.toString());
-//                                                                  LocalBroadcastManager.getInstance(BeaconDiscoveryService.this).sendBroadcast(intent);
-//
-//                                                              }
-//
-//                                                              @Override
-//                                                              public void onConnectionFailed(DeviceConnectionException e) {
-//
-//                                                              }
-//                                                          });
-//                                                      }
-//                                                  });
-//                                              }
-//                                          }
-//                                      });
-//                                  }
-//                              });
-//        beaconManager.startConfigurableDevicesDiscovery();
         }
         else if(STOP.equals(intent.getAction())) {
             Log.i(TAG, "onStartCommand(): Entered STOP action");
