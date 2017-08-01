@@ -15,6 +15,7 @@ import android.util.SparseArray;
 
 import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.services.BeaconDiscoveryService;
+import com.bah.iotsap.services.BluetoothDiscoveryService;
 import com.bah.iotsap.services.SendFileService;
 import com.bah.iotsap.services.ServiceManager;
 
@@ -97,7 +98,7 @@ public class MainActivity extends FragmentActivity {
                 case PREF_INDEX: registeredFragments.put(position, new SettingsFragment());    break;
                 case MAP_INDEX : registeredFragments.put(position, MapFragment.newInstance()); break;
                 case SCAN_INDEX: registeredFragments.put(position, ItemFragment.newInstance(
-                        BeaconDiscoveryService.RECEIVE_JSON)); break;
+                        BluetoothDiscoveryService.RECEIVE_JSON)); break;
                 default: break;
             }
             return registeredFragments.get(position);
