@@ -34,6 +34,49 @@ public class DBUtil {
         return contentValues;
     }
 
+    public static Cursor queryBt(SQLiteDatabase db) {
+        return query(db, "bt");
+    }
+
+    public static Cursor queryBle(SQLiteDatabase db) {
+        return query(db, "ble");
+    }
+
+    public static Cursor queryBeacon(SQLiteDatabase db) {
+        return query(db, "beacon");
+    }
+
+    public static Cursor query(SQLiteDatabase db, String type) {
+        String[] projection = {
+                SQLDB.DataTypes.COLUMN_DATE,
+                SQLDB.DataTypes.COLUMN_TIME,
+                SQLDB.DataTypes.COLUMN_TARGET_ID,
+                SQLDB.DataTypes.COLUMN_NAME,
+                SQLDB.DataTypes.COLUMN_LAT,
+                SQLDB.DataTypes.COLUMN_LON,
+                SQLDB.DataTypes.COLUMN_ALT,
+                SQLDB.DataTypes.COLUMN_ID,
+                SQLDB.DataTypes.COLUMN_RSSI,
+                SQLDB.DataTypes.COLUMN_TYPE
+        };
+
+        String selection = SQLDB.DataTypes.COLUMN_TYPE + " = ?";
+        String[] selectionArgs = {type};
+        String sortOrder =
+                SQLDB.DataTypes.COLUMN_TIME + " DESC";
+
+        Cursor cursor = db.query(
+                "bt",
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        return cursor;
+    }
+
     //Returns a Cursor object that has all the new data from the last scan
     public static Cursor read(SQLiteDatabase db, String tablename) {
         String[] projection = {
@@ -92,4 +135,5 @@ public class DBUtil {
                 selection,
                 selectionArgs);
     }
+
 }

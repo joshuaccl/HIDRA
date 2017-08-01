@@ -103,7 +103,7 @@ public class BluetoothDiscoveryService extends Service {
                 long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
                 rows.add(newRowId);
 
-                Cursor cursor = DBUtil.read(App.db,SQLDB.DataTypes.TABLE_NAME);
+                Cursor cursor = DBUtil.queryBt(App.db);
                 while(cursor.moveToNext()) {
                     String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
                     Log.i("BT DATABASE: " , mac);
