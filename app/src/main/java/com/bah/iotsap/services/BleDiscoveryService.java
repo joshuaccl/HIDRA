@@ -22,7 +22,7 @@ import android.util.Log;
 
 import com.bah.iotsap.App;
 
-import com.bah.iotsap.SQLDB;
+import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;

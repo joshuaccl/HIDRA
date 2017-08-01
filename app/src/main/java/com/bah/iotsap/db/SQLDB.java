@@ -1,11 +1,10 @@
-package com.bah.iotsap;
+package com.bah.iotsap.db;
 
 import android.provider.BaseColumns;
 
 /**
  * Created by 591263 on 7/28/2017.
  */
-
 public final class SQLDB {
 
     //Prevent accidental instantiation of SQLDB class

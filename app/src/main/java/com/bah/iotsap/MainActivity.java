@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.services.BeaconDiscoveryService;
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;

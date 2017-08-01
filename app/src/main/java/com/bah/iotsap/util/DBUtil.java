@@ -5,12 +5,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 
-import com.bah.iotsap.SQLDB;
+import com.bah.iotsap.db.SQLDB;
 
 /**
  * Created by 591263 on 7/27/2017.
  */
-
 public class DBUtil {
 
 

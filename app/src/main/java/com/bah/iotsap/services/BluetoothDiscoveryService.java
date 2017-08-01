@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
@@ -19,8 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.bah.iotsap.App;
-import com.bah.iotsap.SQLDB;
-import com.bah.iotsap.SQLDBHelper;
+import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.FileRW;
 import com.bah.iotsap.util.LocationDiscovery;
@@ -28,7 +26,6 @@ import com.bah.iotsap.util.LocationDiscovery;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
