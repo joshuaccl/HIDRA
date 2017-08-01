@@ -9,10 +9,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -123,8 +125,13 @@ public class BluetoothDiscoveryService extends Service {
         Log.i(TAG, "onCreate(): Entered");
 
         // Ensure service can operate successfully
+        // If we do not have permissions, then disable BLE scans and stop self
         if(!hasPermissions()) {
-            Log.i(TAG, "onCreate(): does not have all permissions, stopping self");
+            Log.i(TAG, "onCreate(): does not have all permissions");
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(PREF_BT_SERVICE, false);
+            editor.apply();
             stopSelf();
         }
 
