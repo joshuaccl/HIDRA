@@ -50,6 +50,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -101,6 +102,57 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 5000);
                 }
             });
+            ////////////////////////////////////////////////////////////////////
+            // DUMMY DATA in HONOLULU
+            String[] scanTypes  = new String[]{"rfid", "nfc", "bt", "ble"};
+            List<Feature> feats = new ArrayList<>();
+            double latw = 21.31100,   late = 21.308200;
+            double lngn = -157.864354, lngs = -157.859097;
+            Random rand = new Random();
+            for(int i = 0; i < 600; ++i) {
+                Feature tempFeat = Feature.fromGeometry(
+                        Point.fromCoordinates(
+                                new double[]{
+                                        rand.nextDouble() * Math.abs(lngn - lngs) + Math.min(lngn, lngs),
+                                        rand.nextDouble() * Math.abs(latw - late) + Math.min(latw, late)})
+                );
+                tempFeat.addStringProperty("scan", scanTypes[rand.nextInt(scanTypes.length)]);
+                feats.add(tempFeat);
+            }
+            Log.i(TAG, "TESTINGASFSAEFSDF");
+            Log.i(TAG, "feats size = " + feats.size());
+            FeatureCollection dummyCol = FeatureCollection.fromFeatures(feats);
+            GeoJsonSource dummySource = new GeoJsonSource("dummy-source",
+                    dummyCol,
+                    new GeoJsonOptions()
+                        .withCluster(true)
+                        .withClusterMaxZoom(17)
+                        .withClusterRadius(12)
+            );
+            mapboxMap.addSource(dummySource);
+            CircleLayer dummyLayer = new CircleLayer("dummy", "dummy-source");
+            dummyLayer.withProperties(
+                    PropertyFactory.circleRadius(
+                            Function.zoom(
+                                    Stops.exponential(
+                                            Stop.stop(12, PropertyFactory.circleRadius(2f)),
+                                            Stop.stop(22, PropertyFactory.circleRadius(180f))
+                                    ).withBase(1.75f)
+                            )
+                    ),
+                    PropertyFactory.circleColor(
+                            Function.property("scan", Stops.categorical(
+                                    Stop.stop(scanTypes[0], PropertyFactory.circleColor(Color.parseColor("#fbb03b"))),
+                                    Stop.stop(scanTypes[1], PropertyFactory.circleColor(Color.parseColor("#223b53"))),
+                                    Stop.stop(scanTypes[2], PropertyFactory.circleColor(Color.parseColor("#e55e5e"))),
+                                    Stop.stop(scanTypes[3], PropertyFactory.circleColor(Color.parseColor("#3bb2d0")))
+                                    )
+                            )
+                    )
+            );
+            mapboxMap.addLayerBelow(dummyLayer, "road");
+
+
             VectorSource vectorSource = new VectorSource(
                     "ethnicity-source",
                     "http://api.mapbox.com/v4/examples.8fgz4egr.json?access_token=" + Mapbox.getAccessToken()
@@ -138,6 +190,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
             }
 
 
+            ////////////////////////////////////////////////////////////////
             // Mapbox LineLayer with GeoJson Example
             List<Position> routeCoordinates = new ArrayList<>();
             routeCoordinates.add(Position.fromCoordinates(-157.858333, 21.306944));
@@ -259,9 +312,10 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
             if(getResources().getString(R.string.dropdown_item_nfc).equals(item.getTitle())) {
                 Log.i(TAG, "onMenuItemClick(MenuItem): NFC ACTION");
-                ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.NFC_INDEX);
+                ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.SCAN_INDEX);
             } else if(getResources().getString(R.string.dropdown_item_rfid).equals(item.getTitle())) {
                 Log.i(TAG, "onMenuItemClick(MenuItem): RFID ACTION");
+                ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.SCAN_INDEX);
             } else if(getResources().getString(R.string.dropdown_item_pref).equals(item.getTitle())) {
                 Log.i(TAG, "onMenuItemClick(MenuItem): PREF ACTION");
                 ((MainActivity) getActivity()).viewPager.setCurrentItem(MainActivity.PREF_INDEX);

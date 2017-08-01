@@ -15,8 +15,6 @@ import android.util.SparseArray;
 
 import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.services.BeaconDiscoveryService;
-import com.bah.iotsap.services.BleDiscoveryService;
-import com.bah.iotsap.services.BluetoothDiscoveryService;
 import com.bah.iotsap.services.SendFileService;
 import com.bah.iotsap.services.ServiceManager;
 
@@ -28,12 +26,10 @@ import com.bah.iotsap.services.ServiceManager;
 public class MainActivity extends FragmentActivity {
 
     private static final String TAG = "MainActivity";
-    public  static final int NUM_FRAGMENTS = 5;
+    public  static final int NUM_FRAGMENTS = 3;
     public  static final int PREF_INDEX    = 0;
     public  static final int MAP_INDEX     = 1;
-    public  static final int BT_INDEX      = 2;
-    public  static final int BLE_INDEX     = 3;
-    public  static final int NFC_INDEX     = 4;
+    public  static final int SCAN_INDEX    = 2;
 
     PagerAdapter pagerAdapter;
     FragmentViewPager viewPager;
@@ -76,11 +72,6 @@ public class MainActivity extends FragmentActivity {
         super.onDestroy();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
     /**
      * Class used to swipe between different fragments.
      */
@@ -105,11 +96,7 @@ public class MainActivity extends FragmentActivity {
             switch(position) {
                 case PREF_INDEX: registeredFragments.put(position, new SettingsFragment());    break;
                 case MAP_INDEX : registeredFragments.put(position, MapFragment.newInstance()); break;
-                case BT_INDEX  : registeredFragments.put(position, ItemFragment.newInstance(
-                        BluetoothDiscoveryService.RECEIVE_JSON)); break;
-                case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
-                        BleDiscoveryService.RECEIVE_JSON)); break;
-                case NFC_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
+                case SCAN_INDEX: registeredFragments.put(position, ItemFragment.newInstance(
                         BeaconDiscoveryService.RECEIVE_JSON)); break;
                 default: break;
             }
