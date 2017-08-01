@@ -36,15 +36,15 @@ public class DBUtil {
     }
 
     public static Cursor queryBt(SQLiteDatabase db) {
-        return query(db, "BT");
+        return query(db, "bt");
     }
 
     public static Cursor queryBle(SQLiteDatabase db) {
-        return query(db, "BLE");
+        return query(db, "ble");
     }
 
     public static Cursor queryBeacon(SQLiteDatabase db) {
-        return query(db, "BEACON");
+        return query(db, "beacon");
     }
 
     public static Cursor query(SQLiteDatabase db, String type) {
