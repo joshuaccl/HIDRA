@@ -123,7 +123,7 @@ public class BeaconDiscoveryService extends Service {
                         Cursor cursor = DBUtil.read(App.db,SQLDB.DataTypes.TABLE_NAME);
                         while(cursor.moveToNext()) {
                             String mac = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TARGET_ID));
-                            Log.i("BEACON DATABASE: " , mac);
+                            Log.i(TAG, mac);
                         }
                         cursor.close();
                     }
