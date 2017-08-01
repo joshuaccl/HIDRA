@@ -1,6 +1,7 @@
 package com.bah.iotsap;
 
 import android.app.Fragment;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.bah.iotsap.db.SQLDB;
+import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.LocationDiscovery;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -104,11 +107,14 @@ public class MapFragment extends Fragment implements PermissionsListener {
             });
             ////////////////////////////////////////////////////////////////////
             // DUMMY DATA in HONOLULU
-            String[] scanTypes  = new String[]{"rfid", "nfc", "bt", "ble"};
+            String[] scanTypes  = new String[]{"rfid", "nfc", "bt", "ble", "beacon"};
             List<Feature> feats = new ArrayList<>();
-            double latw = 21.31100,   late = 21.308200;
+            double latw = 21.31100,    late = 21.308200;
             double lngn = -157.864354, lngs = -157.859097;
+
+
             Random rand = new Random();
+            /*
             for(int i = 0; i < 600; ++i) {
                 Feature tempFeat = Feature.fromGeometry(
                         Point.fromCoordinates(
@@ -126,8 +132,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     dummyCol,
                     new GeoJsonOptions()
                         .withCluster(true)
-                        .withClusterMaxZoom(17)
-                        .withClusterRadius(12)
+                        .withClusterMaxZoom(16)
+                        .withClusterRadius(8)
             );
             mapboxMap.addSource(dummySource);
             CircleLayer dummyLayer = new CircleLayer("dummy", "dummy-source");
@@ -151,8 +157,9 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     )
             );
             mapboxMap.addLayerBelow(dummyLayer, "road");
+            */
 
-
+            // MAPBOX SANFRANCISCO POINT DEMO //
             VectorSource vectorSource = new VectorSource(
                     "ethnicity-source",
                     "http://api.mapbox.com/v4/examples.8fgz4egr.json?access_token=" + Mapbox.getAccessToken()
@@ -188,8 +195,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
             } else {
                 Log.i(TAG, "LAYER IS NOT NULL");
             }
-
-
             ////////////////////////////////////////////////////////////////
             // Mapbox LineLayer with GeoJson Example
             List<Position> routeCoordinates = new ArrayList<>();
@@ -303,6 +308,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
         @Override
         public void onClick(View v) {
             Log.i(TAG, "updt onClick()");
+            updateMapFromDB();
         }
     };
     private PopupMenu.OnMenuItemClickListener menuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
@@ -406,6 +412,64 @@ public class MapFragment extends Fragment implements PermissionsListener {
         Log.i(TAG, "onDestroy()");
         super.onDestroy();
         mapView.onDestroy();
+    }
+
+    private void updateMapFromDB() {
+
+        String[] scanTypes  = new String[]{"rfid", "nfc", "bt", "ble", "beacon"};
+
+        Cursor cursor = DBUtil.read(App.db, SQLDB.DataTypes.TABLE_NAME);
+        List<Feature> myDataFeats = new ArrayList<>();
+        while(cursor.moveToNext()) {
+            Feature tempFeat = Feature.fromGeometry(Point.fromCoordinates(
+                    new double[]{
+                            Double.parseDouble(cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LON))),
+                            Double.parseDouble(cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LAT)))
+                    }
+            ));
+            tempFeat.addStringProperty("scan", cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TYPE)));
+            myDataFeats.add(tempFeat);
+        }
+
+        FeatureCollection myDataCollection = FeatureCollection.fromFeatures(myDataFeats);
+        Log.i(TAG, "myDataCollection=" + myDataCollection.toJson());
+
+        GeoJsonSource myDataSource = (GeoJsonSource) mapboxMap.getSource("mydata-source");
+        if(myDataSource == null) {
+            myDataSource = new GeoJsonSource(
+                    "mydata-source",
+                    myDataCollection,
+                    new GeoJsonOptions()
+                            .withCluster(true)
+                            .withClusterRadius(8)
+                            .withClusterMaxZoom(16)
+            );
+            mapboxMap.addSource(myDataSource);
+            CircleLayer myDataLayer = new CircleLayer("mydata", "mydata-source");
+            myDataLayer.withProperties(
+                    PropertyFactory.circleRadius(
+                            Function.zoom(
+                                    Stops.exponential(
+                                            Stop.stop(12, PropertyFactory.circleRadius(2f)),
+                                            Stop.stop(22, PropertyFactory.circleRadius(180f))
+                                    ).withBase(1.75f)
+                            )
+                    ),
+                    PropertyFactory.circleColor(
+                            Function.property("scan", Stops.categorical(
+                                    Stop.stop(scanTypes[0], PropertyFactory.circleColor(Color.parseColor("#fbb03b"))),
+                                    Stop.stop(scanTypes[1], PropertyFactory.circleColor(Color.parseColor("#223b53"))),
+                                    Stop.stop(scanTypes[2], PropertyFactory.circleColor(Color.parseColor("#e55e5e"))),
+                                    Stop.stop(scanTypes[3], PropertyFactory.circleColor(Color.parseColor("#3bb2d0"))),
+                                    Stop.stop(scanTypes[4], PropertyFactory.circleColor(Color.GREEN))
+                                    )
+                            )
+                    )
+            );
+            mapboxMap.addLayerBelow(myDataLayer, "road");
+        } else {
+            myDataSource.setGeoJson(myDataCollection);
+        }
     }
 
 
