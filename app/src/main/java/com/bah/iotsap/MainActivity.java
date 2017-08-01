@@ -70,8 +70,8 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "onDestroy(): stopping ServiceManager");
         startService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
         stopService(new Intent(this, SendFileService.class));
-        App.mSQLDBHelper.close();
         App.db.execSQL(SQLDB.SQL_DELETE_ENTRIES);
+        App.mSQLDBHelper.close();
         super.onDestroy();
     }
 
