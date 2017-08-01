@@ -47,6 +47,10 @@ public class DBUtil {
         return query(db, "BEACON");
     }
 
+    public static String queryBt = "select * from bt where new = new and type = BT";
+    public static String queryBle = "select * from bt where new = new and type = BLE";
+    public static String queryBeacon = "select * from bt where new = new and type = BEACON";
+
     public static Cursor query(SQLiteDatabase db, String type) {
         String[] projection = {
                 SQLDB.DataTypes.COLUMN_DATE,
