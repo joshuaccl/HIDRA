@@ -114,7 +114,7 @@ public class BeaconDiscoveryService extends Service {
 
                         ContentValues contentValues =
                                 DBUtil.insert(date, time, deviceMac.toString(),
-                                        deviceName, location, id, rssi, "beacon");
+                                              deviceName, location, id, rssi, "beacon");
                         long newRowId = App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
 
                         rows.add(newRowId);

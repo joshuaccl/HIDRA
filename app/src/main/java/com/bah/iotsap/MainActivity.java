@@ -41,6 +41,8 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "onCreate: setContentView");
         setContentView(R.layout.activity_main);
 
+
+
         /**
          * Attach the pager adapter to the viewPager layout of the activity.
          * This allows us to swipe between fragments on the same activity.
@@ -68,7 +70,6 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "onDestroy(): stopping ServiceManager");
         startService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
         stopService(new Intent(this, SendFileService.class));
-        App.db.execSQL(SQLDB.SQL_DELETE_ENTRIES);
         App.mSQLDBHelper.close();
         super.onDestroy();
     }

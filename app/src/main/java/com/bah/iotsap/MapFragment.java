@@ -34,20 +34,15 @@ import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.LineString;
 import com.mapbox.services.commons.geojson.Point;
-import com.mapbox.services.commons.models.Position;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -196,29 +191,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
                 Log.i(TAG, "LAYER IS NOT NULL");
             }
             ////////////////////////////////////////////////////////////////
-            // Mapbox LineLayer with GeoJson Example
-            List<Position> routeCoordinates = new ArrayList<>();
-            routeCoordinates.add(Position.fromCoordinates(-157.858333, 21.306944));
-            routeCoordinates.add(Position.fromCoordinates(-157.858333, 22.306944));
-
-            LineString lineString = LineString.fromCoordinates(routeCoordinates);
-            FeatureCollection collection =
-                    FeatureCollection.fromFeatures(new Feature[]{Feature.fromGeometry(lineString)});
-            Log.i(TAG, collection.toJson());
-            Source geoJsonSource = new GeoJsonSource("line-source", collection);
-            mapboxMap.addSource(geoJsonSource);
-
-            LineLayer lineLayer = new LineLayer("line-layer", "line-source");
-            lineLayer.setProperties(
-                    PropertyFactory.lineDasharray(new Float[]{0.01f, 2f}),
-                    PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
-                    PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
-                    PropertyFactory.lineWidth(5f),
-                    PropertyFactory.lineColor(Color.RED)
-            );
-            mapboxMap.addLayer(lineLayer);
-
-
             // GEOJSON CIRCLE LAYER FROM URL TEST
             try {
                 GeoJsonSource geoSource = new GeoJsonSource("earthquakes",
@@ -421,10 +393,13 @@ public class MapFragment extends Fragment implements PermissionsListener {
         Cursor cursor = DBUtil.read(App.db, SQLDB.DataTypes.TABLE_NAME);
         List<Feature> myDataFeats = new ArrayList<>();
         while(cursor.moveToNext()) {
+            String tempLong = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LON));
+            String tempLat  = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LAT));
+            Log.i(TAG, "lat = " + tempLat + ", lng = " + tempLong);
             Feature tempFeat = Feature.fromGeometry(Point.fromCoordinates(
                     new double[]{
-                            Double.parseDouble(cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LON))),
-                            Double.parseDouble(cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LAT)))
+                            Double.parseDouble(tempLong),
+                            Double.parseDouble(tempLat)
                     }
             ));
             tempFeat.addStringProperty("scan", cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_TYPE)));
@@ -441,8 +416,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     myDataCollection,
                     new GeoJsonOptions()
                             .withCluster(true)
-                            .withClusterRadius(8)
-                            .withClusterMaxZoom(16)
+                            .withClusterRadius(3)
+                            .withClusterMaxZoom(14)
             );
             mapboxMap.addSource(myDataSource);
             CircleLayer myDataLayer = new CircleLayer("mydata", "mydata-source");

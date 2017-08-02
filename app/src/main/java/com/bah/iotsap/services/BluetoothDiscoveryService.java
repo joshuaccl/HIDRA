@@ -101,7 +101,7 @@ public class BluetoothDiscoveryService extends Service {
                 }
 
                 ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "bt");
-                long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+                long newRowId = App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
                 rows.add(newRowId);
 
             } else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {

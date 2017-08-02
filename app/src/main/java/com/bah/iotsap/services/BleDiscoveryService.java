@@ -163,7 +163,7 @@ public class BleDiscoveryService extends Service {
 
             BluetoothDevice device = result.getDevice();
             String deviceName = device.getName();
-            if(deviceName==null) deviceName = "Unknown Device";
+            if(deviceName == null) deviceName = "Unknown Device";
             String deviceMac  = device.getAddress();
             int    rssi       = result.getRssi();
             String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
@@ -198,7 +198,7 @@ public class BleDiscoveryService extends Service {
 
             //Insert new data into database
             ContentValues contentValues = DBUtil.insert(date, time, deviceMac, deviceName, location, id, rssi, "ble");
-            long newRowId= App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
+            long newRowId = App.db.insert(SQLDB.DataTypes.TABLE_NAME, null, contentValues);
             rows.add(newRowId);
         }
 
