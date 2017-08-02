@@ -1,6 +1,7 @@
 package com.bah.iotsap;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.util.DBUtil;
+import com.bah.iotsap.util.GeoJsonClusteringActivity;
 import com.bah.iotsap.util.LocationDiscovery;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -97,6 +99,7 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
         @Override
         public void onClick(View v) {
             Log.i(TAG, "filt onClick()");
+            startActivity(new Intent(getActivity(), GeoJsonClusteringActivity.class));
         }
     };
     private View.OnClickListener updtBtnListener = new View.OnClickListener() {
@@ -397,12 +400,17 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
         FeatureCollection myDataCollection = FeatureCollection.fromFeatures(myDataFeats);
         Log.i(TAG, "myDataCollection=" + myDataCollection.toJson());
 
+        //EDIT ME
+        //COLLECTING BLU DEVICES > PLOT PRETTY
         GeoJsonSource myDataSource = (GeoJsonSource) mapboxMap.getSource("mydata-source");
         if(myDataSource == null) {
             myDataSource = new GeoJsonSource(
                     "mydata-source",
                     myDataCollection,
                     new GeoJsonOptions()
+                            //adjust parameters to make pretty
+                            //stops affect how big circles are
+
                             .withCluster(true)
                             .withClusterRadius(3)
                             .withClusterMaxZoom(14)
@@ -429,6 +437,8 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
                             )
                     )
             );
+
+            //STOP HERE
             mapboxMap.addLayerBelow(myDataLayer, "road");
         } else {
             myDataSource.setGeoJson(myDataCollection);
