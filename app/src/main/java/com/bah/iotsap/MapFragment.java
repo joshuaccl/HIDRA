@@ -395,6 +395,10 @@ public class MapFragment extends Fragment implements PermissionsListener {
         while(cursor.moveToNext()) {
             String tempLong = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LON));
             String tempLat  = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LAT));
+            if(tempLong == null || tempLat == null) {
+                Log.i(TAG, "got null item");
+                continue;
+            }
             Log.i(TAG, "lat = " + tempLat + ", lng = " + tempLong);
             Feature tempFeat = Feature.fromGeometry(Point.fromCoordinates(
                     new double[]{
