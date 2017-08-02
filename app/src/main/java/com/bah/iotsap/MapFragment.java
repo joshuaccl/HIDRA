@@ -56,7 +56,7 @@ import java.util.Random;
  * all data of the app.
  * We will either use a MapFragment or create a MapActivity for the final product.
  */
-public class MapFragment extends Fragment implements PermissionsListener {
+public class MapFragment extends Fragment implements PermissionsListener, OnMapReadyCallback {
 
     private static final String TAG = "MapFragment";
 
@@ -66,186 +66,21 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
     private LocationDiscovery locationDisc;
     private ImageButton moreBtn;
-    private Button selfBtn;
-    private Button stylBtn;
     private Button filtBtn;
     private Button updtBtn;
 
     /////////////////// ALL LISTENERS AND CALLBACKS ///////////////////
-    private OnMapReadyCallback mapReadyCallback = new OnMapReadyCallback() {
+    MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
         @Override
-        public void onMapReady(final MapboxMap mapboxMap) {
-            Log.i(TAG, "onMapReady(MapboxMap)");
-            MapFragment.this.mapboxMap = mapboxMap;
-
-            // Ensure we have location permissions
-            permissionsManager = new PermissionsManager(MapFragment.this);
-            if(!permissionsManager.areLocationPermissionsGranted(getActivity())) {
-                permissionsManager.requestLocationPermissions(getActivity());
-            } else {
-                enableLocationTracking();
-            }
-
-            // Setup action to happen on map click
-            mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(@NonNull LatLng point) {
-                    final Location location = locationDisc.getLocation();
-                    CameraPosition position = new CameraPosition.Builder()
-                            .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                            .zoom(17)
-                            .bearing(0)
-                            .tilt(30)
-                            .build();
-                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 5000);
-                }
-            });
-            ////////////////////////////////////////////////////////////////////
-            // DUMMY DATA in HONOLULU
-            String[] scanTypes  = new String[]{"rfid", "nfc", "bt", "ble", "beacon"};
-            List<Feature> feats = new ArrayList<>();
-            double latw = 21.31100,    late = 21.308200;
-            double lngn = -157.864354, lngs = -157.859097;
-
-
-            Random rand = new Random();
-            /*
-            for(int i = 0; i < 600; ++i) {
-                Feature tempFeat = Feature.fromGeometry(
-                        Point.fromCoordinates(
-                                new double[]{
-                                        rand.nextDouble() * Math.abs(lngn - lngs) + Math.min(lngn, lngs),
-                                        rand.nextDouble() * Math.abs(latw - late) + Math.min(latw, late)})
-                );
-                tempFeat.addStringProperty("scan", scanTypes[rand.nextInt(scanTypes.length)]);
-                feats.add(tempFeat);
-            }
-            Log.i(TAG, "TESTINGASFSAEFSDF");
-            Log.i(TAG, "feats size = " + feats.size());
-            FeatureCollection dummyCol = FeatureCollection.fromFeatures(feats);
-            GeoJsonSource dummySource = new GeoJsonSource("dummy-source",
-                    dummyCol,
-                    new GeoJsonOptions()
-                        .withCluster(true)
-                        .withClusterMaxZoom(16)
-                        .withClusterRadius(8)
-            );
-            mapboxMap.addSource(dummySource);
-            CircleLayer dummyLayer = new CircleLayer("dummy", "dummy-source");
-            dummyLayer.withProperties(
-                    PropertyFactory.circleRadius(
-                            Function.zoom(
-                                    Stops.exponential(
-                                            Stop.stop(12, PropertyFactory.circleRadius(2f)),
-                                            Stop.stop(22, PropertyFactory.circleRadius(180f))
-                                    ).withBase(1.75f)
-                            )
-                    ),
-                    PropertyFactory.circleColor(
-                            Function.property("scan", Stops.categorical(
-                                    Stop.stop(scanTypes[0], PropertyFactory.circleColor(Color.parseColor("#fbb03b"))),
-                                    Stop.stop(scanTypes[1], PropertyFactory.circleColor(Color.parseColor("#223b53"))),
-                                    Stop.stop(scanTypes[2], PropertyFactory.circleColor(Color.parseColor("#e55e5e"))),
-                                    Stop.stop(scanTypes[3], PropertyFactory.circleColor(Color.parseColor("#3bb2d0")))
-                                    )
-                            )
-                    )
-            );
-            mapboxMap.addLayerBelow(dummyLayer, "road");
-            */
-
-            // MAPBOX SANFRANCISCO POINT DEMO //
-            VectorSource vectorSource = new VectorSource(
-                    "ethnicity-source",
-                    "http://api.mapbox.com/v4/examples.8fgz4egr.json?access_token=" + Mapbox.getAccessToken()
-            );
-            mapboxMap.addSource(vectorSource);
-
-            CircleLayer circleLayer = new CircleLayer("population", "ethnicity-source");
-            circleLayer.setSourceLayer("sf2010");
-            circleLayer.withProperties(
-                    PropertyFactory.circleRadius(
-                            Function.zoom(
-                                    Stops.exponential(
-                                            Stop.stop(12, PropertyFactory.circleRadius(2f)),
-                                            Stop.stop(22, PropertyFactory.circleRadius(180f))
-                                    ).withBase(1.75f)
-                            )
-                    ),
-                    PropertyFactory.circleColor(
-                            Function.property("ethnicity", Stops.categorical(
-                                    Stop.stop("white", PropertyFactory.circleColor(Color.parseColor("#fbb03b"))),
-                                    Stop.stop("Black", PropertyFactory.circleColor(Color.parseColor("#223b53"))),
-                                    Stop.stop("Hispanic", PropertyFactory.circleColor(Color.parseColor("#e55e5e"))),
-                                    Stop.stop("Asian", PropertyFactory.circleColor(Color.parseColor("#3bb2d0"))),
-                                    Stop.stop("Other", PropertyFactory.circleColor(Color.parseColor("#cccccc")))
-                                    )
-                            )
-                    )
-            );
-            mapboxMap.addLayer(circleLayer);
-            Layer layer = mapboxMap.getLayer("sf2010");
-            if(layer == null) {
-                Log.i(TAG, "LAYER IS NULL");
-            } else {
-                Log.i(TAG, "LAYER IS NOT NULL");
-            }
-            ////////////////////////////////////////////////////////////////
-            // GEOJSON CIRCLE LAYER FROM URL TEST
-            try {
-                GeoJsonSource geoSource = new GeoJsonSource("earthquakes",
-                        new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
-                        new GeoJsonOptions()
-                            .withCluster(true)
-                            .withClusterMaxZoom(15)
-                            .withClusterRadius(20)
-                );
-                mapboxMap.addSource(geoSource);
-            } catch (MalformedURLException e) {
-                Log.i(TAG, "MalformedURLException", e);
-            }
-            CircleLayer unclustered = new CircleLayer("unclustered-points", "earthquakes");
-            unclustered.setProperties(
-                    PropertyFactory.circleColor(Color.parseColor("#FBB03B")),
-                    PropertyFactory.circleRadius(20f),
-                    PropertyFactory.circleBlur(1f)
-            );
-            unclustered.setFilter(Filter.neq("cluster", true));
-            mapboxMap.addLayerBelow(unclustered, "building");
-
-            // GEOJSON CIRCLE LAYER FROM COLLECTION TEST
-            // USE THIS EXAMPLE TO POPULATE MAP!!!! THIS WORKS!!
-            List<Feature> featList = new ArrayList<>();
-            Feature myFeat;
-
-            myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.858333, 21.306944}));
-            myFeat.addStringProperty("title", "Honolulu");
-            featList.add(myFeat);
-            myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.817, 21.297}));
-            myFeat.addStringProperty("title", "Manoa");
-            featList.add(myFeat);
-            FeatureCollection coll = FeatureCollection.fromFeatures(featList);
-            Log.i(TAG, coll.toJson());
-
-            GeoJsonSource mySource = new GeoJsonSource("testing", coll,
-                    new GeoJsonOptions()
-                        .withCluster(true)
-                        .withClusterMaxZoom(15)
-                        .withClusterRadius(20));
-            mapboxMap.addSource(mySource);
-            CircleLayer testLayer = new CircleLayer("test-layer", "testing");
-            testLayer.setProperties(
-                    PropertyFactory.circleColor(Function.property("title", Stops.categorical(
-                            Stop.stop("Honolulu", PropertyFactory.circleColor(Color.BLUE)),
-                            Stop.stop("Manoa", PropertyFactory.circleColor(Color.RED))
-                    ))),
-                    PropertyFactory.circleRadius(
-                            Function.zoom(Stops.exponential(
-                                    Stop.stop(12, PropertyFactory.circleRadius(5f)),
-                                    Stop.stop(22, PropertyFactory.circleRadius(180f))
-                            ).withBase(1.75f)))
-            );
-            mapboxMap.addLayerBelow(testLayer, "road");
+        public void onMapClick(@NonNull LatLng point) {
+            final Location location = locationDisc.getLocation();
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .zoom(17)
+                    .bearing(0)
+                    .tilt(30)
+                    .build();
+            mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 5000);
         }
     };
     private View.OnClickListener moreBtnListener = new View.OnClickListener() {
@@ -256,18 +91,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
             menu.getMenuInflater().inflate(R.menu.more_dropdown_menu, menu.getMenu());
             menu.setOnMenuItemClickListener(menuItemClickListener);
             menu.show();
-        }
-    };
-    private View.OnClickListener selfBtnListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.i(TAG, "self onClick()");
-        }
-    };
-    private View.OnClickListener stylBtnListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.i(TAG, "styl onClick()");
         }
     };
     private View.OnClickListener filtBtnListener = new View.OnClickListener() {
@@ -320,20 +143,16 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
         // UI setup
         moreBtn = (ImageButton) fragmentLayout.findViewById(R.id.map_top_linear_more_btn);
-        selfBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_self_btn);
-        stylBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_styl_btn);
         filtBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_filt_btn);
         updtBtn = (Button)      fragmentLayout.findViewById(R.id.map_top_linear_updt_btn);
         moreBtn.setOnClickListener(moreBtnListener);
-        selfBtn.setOnClickListener(selfBtnListener);
-        stylBtn.setOnClickListener(stylBtnListener);
         filtBtn.setOnClickListener(filtBtnListener);
         updtBtn.setOnClickListener(updtBtnListener);
 
         // MapView setup
         mapView = (MapView) fragmentLayout.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(mapReadyCallback);
+        mapView.getMapAsync(this);
         return fragmentLayout;
     }
 
@@ -384,6 +203,171 @@ public class MapFragment extends Fragment implements PermissionsListener {
         Log.i(TAG, "onDestroy()");
         super.onDestroy();
         mapView.onDestroy();
+    }
+
+    @Override
+    public void onMapReady(final MapboxMap mapboxMap) {
+
+        Log.i(TAG, "onMapReady(MapboxMap)");
+        this.mapboxMap = mapboxMap;
+
+        // Ensure we have location permissions
+        permissionsManager = new PermissionsManager(MapFragment.this);
+        if(!PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+            Log.i(TAG, "onMapReady(): Permissions not granted");
+            permissionsManager.requestLocationPermissions(getActivity());
+        } else {
+            enableLocationTracking();
+        }
+        // Setup action to happen on map click
+        mapboxMap.setOnMapClickListener(mapClickListener);
+
+        ////////////////////////////////////////////////////////////////////
+        String[] scanTypes  = new String[]{"rfid", "nfc", "bt", "ble", "beacon"};
+        List<Feature> feats = new ArrayList<>();
+        double latw = 21.31100,    late = 21.308200;
+        double lngn = -157.864354, lngs = -157.859097;
+        Random rand = new Random();
+
+
+        /* TEST DATA IN HONOLULU
+
+        for(int i = 0; i < 600; ++i) {
+            Feature tempFeat = Feature.fromGeometry(
+                    Point.fromCoordinates(
+                            new double[]{
+                                    rand.nextDouble() * Math.abs(lngn - lngs) + Math.min(lngn, lngs),
+                                    rand.nextDouble() * Math.abs(latw - late) + Math.min(latw, late)})
+            );
+            tempFeat.addStringProperty("scan", scanTypes[rand.nextInt(scanTypes.length)]);
+            feats.add(tempFeat);
+        }
+        Log.i(TAG, "TESTINGASFSAEFSDF");
+        Log.i(TAG, "feats size = " + feats.size());
+        FeatureCollection dummyCol = FeatureCollection.fromFeatures(feats);
+        GeoJsonSource dummySource = new GeoJsonSource("dummy-source",
+                dummyCol,
+                new GeoJsonOptions()
+                    .withCluster(true)
+                    .withClusterMaxZoom(16)
+                    .withClusterRadius(8)
+        );
+        mapboxMap.addSource(dummySource);
+        CircleLayer dummyLayer = new CircleLayer("dummy", "dummy-source");
+        dummyLayer.withProperties(
+                PropertyFactory.circleRadius(
+                        Function.zoom(
+                                Stops.exponential(
+                                        Stop.stop(12, PropertyFactory.circleRadius(2f)),
+                                        Stop.stop(22, PropertyFactory.circleRadius(180f))
+                                ).withBase(1.75f)
+                        )
+                ),
+                PropertyFactory.circleColor(
+                        Function.property("scan", Stops.categorical(
+                                Stop.stop(scanTypes[0], PropertyFactory.circleColor(Color.parseColor("#fbb03b"))),
+                                Stop.stop(scanTypes[1], PropertyFactory.circleColor(Color.parseColor("#223b53"))),
+                                Stop.stop(scanTypes[2], PropertyFactory.circleColor(Color.parseColor("#e55e5e"))),
+                                Stop.stop(scanTypes[3], PropertyFactory.circleColor(Color.parseColor("#3bb2d0")))
+                                )
+                        )
+                )
+        );
+        mapboxMap.addLayerBelow(dummyLayer, "road");
+        */
+
+        // MAPBOX SANFRANCISCO POINT DEMO //
+        VectorSource vectorSource = new VectorSource(
+                "ethnicity-source",
+                "http://api.mapbox.com/v4/examples.8fgz4egr.json?access_token=" + Mapbox.getAccessToken()
+        );
+        mapboxMap.addSource(vectorSource);
+
+        CircleLayer circleLayer = new CircleLayer("population", "ethnicity-source");
+        circleLayer.setSourceLayer("sf2010");
+        circleLayer.withProperties(
+                PropertyFactory.circleRadius(
+                        Function.zoom(
+                                Stops.exponential(
+                                        Stop.stop(12, PropertyFactory.circleRadius(2f)),
+                                        Stop.stop(22, PropertyFactory.circleRadius(180f))
+                                ).withBase(1.75f)
+                        )
+                ),
+                PropertyFactory.circleColor(
+                        Function.property("ethnicity", Stops.categorical(
+                                Stop.stop("white", PropertyFactory.circleColor(Color.parseColor("#fbb03b"))),
+                                Stop.stop("Black", PropertyFactory.circleColor(Color.parseColor("#223b53"))),
+                                Stop.stop("Hispanic", PropertyFactory.circleColor(Color.parseColor("#e55e5e"))),
+                                Stop.stop("Asian", PropertyFactory.circleColor(Color.parseColor("#3bb2d0"))),
+                                Stop.stop("Other", PropertyFactory.circleColor(Color.parseColor("#cccccc")))
+                                )
+                        )
+                )
+        );
+        mapboxMap.addLayer(circleLayer);
+        Layer layer = mapboxMap.getLayer("sf2010");
+        if(layer == null) {
+            Log.i(TAG, "LAYER IS NULL");
+        } else {
+            Log.i(TAG, "LAYER IS NOT NULL");
+        }
+        ////////////////////////////////////////////////////////////////
+        // GEOJSON CIRCLE LAYER FROM URL TEST
+        try {
+            GeoJsonSource geoSource = new GeoJsonSource("earthquakes",
+                    new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
+                    new GeoJsonOptions()
+                            .withCluster(true)
+                            .withClusterMaxZoom(15)
+                            .withClusterRadius(20)
+            );
+            mapboxMap.addSource(geoSource);
+        } catch (MalformedURLException e) {
+            Log.i(TAG, "MalformedURLException", e);
+        }
+        CircleLayer unclustered = new CircleLayer("unclustered-points", "earthquakes");
+        unclustered.setProperties(
+                PropertyFactory.circleColor(Color.parseColor("#FBB03B")),
+                PropertyFactory.circleRadius(20f),
+                PropertyFactory.circleBlur(1f)
+        );
+        unclustered.setFilter(Filter.neq("cluster", true));
+        mapboxMap.addLayerBelow(unclustered, "building");
+
+        // GEOJSON CIRCLE LAYER FROM COLLECTION TEST
+        // USE THIS EXAMPLE TO POPULATE MAP!!!! THIS WORKS!!
+        List<Feature> featList = new ArrayList<>();
+        Feature myFeat;
+
+        myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.858333, 21.306944}));
+        myFeat.addStringProperty("title", "Honolulu");
+        featList.add(myFeat);
+        myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.817, 21.297}));
+        myFeat.addStringProperty("title", "Manoa");
+        featList.add(myFeat);
+        FeatureCollection coll = FeatureCollection.fromFeatures(featList);
+        Log.i(TAG, coll.toJson());
+
+        GeoJsonSource mySource = new GeoJsonSource("testing", coll,
+                new GeoJsonOptions()
+                        .withCluster(true)
+                        .withClusterMaxZoom(15)
+                        .withClusterRadius(20));
+        mapboxMap.addSource(mySource);
+        CircleLayer testLayer = new CircleLayer("test-layer", "testing");
+        testLayer.setProperties(
+                PropertyFactory.circleColor(Function.property("title", Stops.categorical(
+                        Stop.stop("Honolulu", PropertyFactory.circleColor(Color.BLUE)),
+                        Stop.stop("Manoa", PropertyFactory.circleColor(Color.RED))
+                ))),
+                PropertyFactory.circleRadius(
+                        Function.zoom(Stops.exponential(
+                                Stop.stop(12, PropertyFactory.circleRadius(5f)),
+                                Stop.stop(22, PropertyFactory.circleRadius(180f))
+                        ).withBase(1.75f)))
+        );
+        mapboxMap.addLayerBelow(testLayer, "road");
     }
 
     private void updateMapFromDB() {
