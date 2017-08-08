@@ -3,6 +3,7 @@ package com.bah.iotsap;
 import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,7 +22,10 @@ import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.GeoJsonClusteringActivity;
 import com.bah.iotsap.util.LocationDiscovery;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -213,6 +217,37 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
 
         Log.i(TAG, "onMapReady(MapboxMap)");
         this.mapboxMap = mapboxMap;
+
+        //__________________________________________________________________________________
+        //Hard coding a marker
+
+        LatLng impacthub = new LatLng(21.294907, -157.852051);
+        mapboxMap.addMarker(new MarkerOptions().position(impacthub).title("Impact Hub Honolulu")
+        .snippet("Colleen wants to go sleep"));
+
+        //Add a marker in Honolulu Hawaii and move the camera
+
+        //Parking spots near impact hub
+        LatLng oahu_church = new LatLng(21.296321, -157.851863);
+        mapboxMap.addMarker(new MarkerOptions().position(oahu_church).title("Oahu Church of Christ"));
+        LatLng aloha_dog = new LatLng(21.296558, -157.852327);
+        mapboxMap.addMarker(new MarkerOptions().position(aloha_dog).title("Aloha Dog"));
+        LatLng parking_lot = new LatLng(21.294561, -157.852420);
+        mapboxMap.addMarker(new MarkerOptions().position(parking_lot).title("Parking Lot"));
+        LatLng ward_theatre = new LatLng(21.294486, -157.853361);
+        mapboxMap.addMarker(new MarkerOptions().position(ward_theatre).title("Ward Theatre"));
+        LatLng modern_detail = new LatLng(21.295691, -157.851237);
+        mapboxMap.addMarker(new MarkerOptions().position(modern_detail).title("Modern Detail"));
+        LatLng phuket_thai = new LatLng(21.294540, -157.851424);
+        mapboxMap.addMarker(new MarkerOptions().position(phuket_thai).title("Phuket Thai"));
+        LatLng prestige_valet = new LatLng(21.294364, -157.850797);
+        mapboxMap.addMarker(new MarkerOptions().position(prestige_valet).title("Prestige Valet"));
+        LatLng uhaul = new LatLng(21.295441, -157.851130);
+        mapboxMap.addMarker(new MarkerOptions().position(uhaul).title("U-Haul"));
+        LatLng tint_shop = new LatLng(21.295608, -157.852322);
+        mapboxMap.addMarker(new MarkerOptions().position(tint_shop).title("Tint Shop Hawaii"));
+        LatLng bliss_day = new LatLng(21.295022, -157.850847);
+        mapboxMap.addMarker(new MarkerOptions().position(bliss_day).title("Bliss Day Spa"));
 
         // Ensure we have location permissions
         permissionsManager = new PermissionsManager(MapFragment.this);
