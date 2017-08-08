@@ -379,6 +379,7 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
 
         Cursor cursor = DBUtil.read(App.db, SQLDB.DataTypes.TABLE_NAME);
         List<Feature> myDataFeats = new ArrayList<>();
+        //take out data and put into this list ^
         while(cursor.moveToNext()) {
             String tempLong = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LON));
             String tempLat  = cursor.getString(cursor.getColumnIndex(SQLDB.DataTypes.COLUMN_LAT));
@@ -398,6 +399,7 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
         }
 
         FeatureCollection myDataCollection = FeatureCollection.fromFeatures(myDataFeats);
+        //geo json file with all the features from list
         Log.i(TAG, "myDataCollection=" + myDataCollection.toJson());
 
         //EDIT ME
