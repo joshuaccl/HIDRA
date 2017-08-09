@@ -3,11 +3,12 @@ package com.bah.iotsap;
 import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,8 +23,8 @@ import com.bah.iotsap.db.SQLDB;
 import com.bah.iotsap.util.DBUtil;
 import com.bah.iotsap.util.GeoJsonClusteringActivity;
 import com.bah.iotsap.util.LocationDiscovery;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -221,33 +222,94 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
         //__________________________________________________________________________________
         //Hard coding a marker
 
+        // Bluetooth icon
+        IconFactory iconFactory = IconFactory.getInstance(getActivity().getApplicationContext());
+        Drawable iconBlueD = ContextCompat.getDrawable(getActivity().getApplicationContext(),R.drawable.bluetooth_icon);
+        Icon iconBlue = iconFactory.fromResource(R.drawable.bluetooth_icon);
+
+        // Water bottle icon
+        Drawable iconWater = ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.water_bottle);
+        Icon iconResource = iconFactory.fromResource(R.drawable.water_bottle);
+
+        // First Aid icon
+        Drawable iconFirstAid = ContextCompat.getDrawable(getActivity().getApplicationContext(),
+                R.drawable.firstaid); //goes into res>drawable folder
+        Icon iconAid = iconFactory.fromResource(R.drawable.firstaid);
+
+        // Person icon
+        Drawable iconPersonDrawable = ContextCompat.getDrawable(getActivity().getApplicationContext(),R.drawable.person);
+        Icon iconPerson = iconFactory.fromResource(R.drawable.person);
+
+        // Food icon
+        Drawable iconFoodDrawable = ContextCompat.getDrawable(getActivity().getApplicationContext(),R.drawable.food);
+        Icon iconFood = iconFactory.fromResource(R.drawable.food);
+
+        //Impact hub marker
         LatLng impacthub = new LatLng(21.294907, -157.852051);
         mapboxMap.addMarker(new MarkerOptions().position(impacthub).title("Impact Hub Honolulu")
-        .snippet("Colleen wants to go sleep"));
+        .snippet("Colleen wants to go sleep").icon(iconBlue));
 
         //Add a marker in Honolulu Hawaii and move the camera
 
         //Parking spots near impact hub
         LatLng oahu_church = new LatLng(21.296321, -157.851863);
-        mapboxMap.addMarker(new MarkerOptions().position(oahu_church).title("Oahu Church of Christ"));
+        mapboxMap.addMarker(new MarkerOptions().position(oahu_church).title("Oahu Church of Christ").icon(iconBlue));
         LatLng aloha_dog = new LatLng(21.296558, -157.852327);
-        mapboxMap.addMarker(new MarkerOptions().position(aloha_dog).title("Aloha Dog"));
+        mapboxMap.addMarker(new MarkerOptions().position(aloha_dog).title("Aloha Dog").icon(iconBlue));
         LatLng parking_lot = new LatLng(21.294561, -157.852420);
-        mapboxMap.addMarker(new MarkerOptions().position(parking_lot).title("Parking Lot"));
+        mapboxMap.addMarker(new MarkerOptions().position(parking_lot).title("Parking Lot").icon(iconBlue));
         LatLng ward_theatre = new LatLng(21.294486, -157.853361);
-        mapboxMap.addMarker(new MarkerOptions().position(ward_theatre).title("Ward Theatre"));
+        mapboxMap.addMarker(new MarkerOptions().position(ward_theatre).title("Ward Theatre").icon(iconBlue));
         LatLng modern_detail = new LatLng(21.295691, -157.851237);
-        mapboxMap.addMarker(new MarkerOptions().position(modern_detail).title("Modern Detail"));
+        mapboxMap.addMarker(new MarkerOptions().position(modern_detail).title("Modern Detail").icon(iconBlue));
         LatLng phuket_thai = new LatLng(21.294540, -157.851424);
-        mapboxMap.addMarker(new MarkerOptions().position(phuket_thai).title("Phuket Thai"));
+        mapboxMap.addMarker(new MarkerOptions().position(phuket_thai).title("Phuket Thai").icon(iconResource));
         LatLng prestige_valet = new LatLng(21.294364, -157.850797);
-        mapboxMap.addMarker(new MarkerOptions().position(prestige_valet).title("Prestige Valet"));
+        mapboxMap.addMarker(new MarkerOptions().position(prestige_valet).title("Prestige Valet").icon(iconBlue));
         LatLng uhaul = new LatLng(21.295441, -157.851130);
-        mapboxMap.addMarker(new MarkerOptions().position(uhaul).title("U-Haul"));
+        mapboxMap.addMarker(new MarkerOptions().position(uhaul).title("U-Haul").icon(iconBlue));
         LatLng tint_shop = new LatLng(21.295608, -157.852322);
-        mapboxMap.addMarker(new MarkerOptions().position(tint_shop).title("Tint Shop Hawaii"));
+        mapboxMap.addMarker(new MarkerOptions().position(tint_shop).title("Tint Shop Hawaii").icon(iconBlue));
         LatLng bliss_day = new LatLng(21.295022, -157.850847);
-        mapboxMap.addMarker(new MarkerOptions().position(bliss_day).title("Bliss Day Spa"));
+        mapboxMap.addMarker(new MarkerOptions().position(bliss_day).title("Bliss Day Spa").icon(iconBlue));
+
+
+        //downtown locations
+        LatLng Downtown = new LatLng(21.310386, -157.862305);
+        mapboxMap.addMarker(new MarkerOptions().position(Downtown).title("Downtown").icon(iconBlue));
+        LatLng hi_theatre = new LatLng(21.310739, -157.861408);
+        mapboxMap.addMarker(new MarkerOptions().position(hi_theatre).title("Hawaii Theatre").icon(iconBlue));
+        LatLng kukuiplaza = new LatLng(21.312485, -157.859198);
+        mapboxMap.addMarker(new MarkerOptions().position(kukuiplaza).title("Kukui Plaza").icon(iconBlue));
+        LatLng fortstreet = new LatLng(21.310556, -157.859820);
+        mapboxMap.addMarker(new MarkerOptions().position(fortstreet).title("Ward Theatre").icon(iconBlue));
+//        LatLng modern_detail = new LatLng(21.295691, -157.851237);
+//        mapboxMap.addMarker(new MarkerOptions().position(modern_detail).title("Modern Detail").icon(iconBlue));
+//        LatLng phuket_thai = new LatLng(21.294540, -157.851424);
+//        mapboxMap.addMarker(new MarkerOptions().position(phuket_thai).title("Phuket Thai").icon(iconResource));
+//        LatLng prestige_valet = new LatLng(21.294364, -157.850797);
+//        mapboxMap.addMarker(new MarkerOptions().position(prestige_valet).title("Prestige Valet").icon(iconBlue));
+//        LatLng uhaul = new LatLng(21.295441, -157.851130);
+//        mapboxMap.addMarker(new MarkerOptions().position(uhaul).title("U-Haul").icon(iconBlue));
+//        LatLng tint_shop = new LatLng(21.295608, -157.852322);
+//        mapboxMap.addMarker(new MarkerOptions().position(tint_shop).title("Tint Shop Hawaii").icon(iconResource));
+//        LatLng bliss_day = new LatLng(21.295022, -157.850847);
+//        mapboxMap.addMarker(new MarkerOptions().position(bliss_day).title("Bliss Day Spa").icon(iconBlue));
+
+        LatLng responder = new LatLng(21.298451, -157.855854);
+        mapboxMap.addMarker(new MarkerOptions().position(responder).title("Responder").icon(iconPerson));
+
+        LatLng food = new LatLng(21.298731, -157.853622);
+        mapboxMap.addMarker(new MarkerOptions().position(food).title("Food").icon(iconFood));
+
+        LatLng water = new LatLng(21.297092, -157.854395);
+        mapboxMap.addMarker(new MarkerOptions().position(water).title("Water").icon(iconResource));
+
+        LatLng firstAid = new LatLng(21.299771, -157.854095);
+        mapboxMap.addMarker(new MarkerOptions().position(firstAid).title("FirstAid").icon(iconAid));
+
+        LatLng bluetoothMarker = new LatLng(21.308047, -157.862034);
+        mapboxMap.addMarker(new MarkerOptions().position(bluetoothMarker).title("BluetoothMarker").icon(iconBlue));
 
         // Ensure we have location permissions
         permissionsManager = new PermissionsManager(MapFragment.this);
@@ -375,37 +437,37 @@ public class MapFragment extends Fragment implements PermissionsListener, OnMapR
 
         // GEOJSON CIRCLE LAYER FROM COLLECTION TEST
         // USE THIS EXAMPLE TO POPULATE MAP!!!! THIS WORKS!!
-        List<Feature> featList = new ArrayList<>();
-        Feature myFeat;
-
-        myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.858333, 21.306944}));
-        myFeat.addStringProperty("title", "Honolulu");
-        featList.add(myFeat);
-        myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.817, 21.297}));
-        myFeat.addStringProperty("title", "Manoa");
-        featList.add(myFeat);
-        FeatureCollection coll = FeatureCollection.fromFeatures(featList);
-        Log.i(TAG, coll.toJson());
-
-        GeoJsonSource mySource = new GeoJsonSource("testing", coll,
-                new GeoJsonOptions()
-                        .withCluster(true)
-                        .withClusterMaxZoom(15)
-                        .withClusterRadius(20));
-        mapboxMap.addSource(mySource);
-        CircleLayer testLayer = new CircleLayer("test-layer", "testing");
-        testLayer.setProperties(
-                PropertyFactory.circleColor(Function.property("title", Stops.categorical(
-                        Stop.stop("Honolulu", PropertyFactory.circleColor(Color.BLUE)),
-                        Stop.stop("Manoa", PropertyFactory.circleColor(Color.RED))
-                ))),
-                PropertyFactory.circleRadius(
-                        Function.zoom(Stops.exponential(
-                                Stop.stop(12, PropertyFactory.circleRadius(5f)),
-                                Stop.stop(22, PropertyFactory.circleRadius(180f))
-                        ).withBase(1.75f)))
-        );
-        mapboxMap.addLayerBelow(testLayer, "road");
+//        List<Feature> featList = new ArrayList<>();
+//        Feature myFeat;
+//
+//        myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.858333, 21.306944}));
+//        myFeat.addStringProperty("title", "Honolulu");
+//        featList.add(myFeat);
+//        myFeat = Feature.fromGeometry(Point.fromCoordinates(new double[]{-157.817, 21.297}));
+//        myFeat.addStringProperty("title", "Manoa");
+//        featList.add(myFeat);
+//        FeatureCollection coll = FeatureCollection.fromFeatures(featList);
+//        Log.i(TAG, coll.toJson());
+//
+//        GeoJsonSource mySource = new GeoJsonSource("testing", coll,
+//                new GeoJsonOptions()
+//                        .withCluster(true)
+//                        .withClusterMaxZoom(15)
+//                        .withClusterRadius(20));
+//        mapboxMap.addSource(mySource);
+//        CircleLayer testLayer = new CircleLayer("test-layer", "testing");
+//        testLayer.setProperties(
+//                PropertyFactory.circleColor(Function.property("title", Stops.categorical(
+//                        //Stop.stop("Honolulu", PropertyFactory.circleColor(Color.BLUE)),
+//                        Stop.stop("Manoa", PropertyFactory.circleColor(Color.RED))
+//                ))),
+//                PropertyFactory.circleRadius(
+//                        Function.zoom(Stops.exponential(
+//                                Stop.stop(12, PropertyFactory.circleRadius(5f)),
+//                                Stop.stop(22, PropertyFactory.circleRadius(180f))
+//                        ).withBase(1.75f)))
+//        );
+//        mapboxMap.addLayerBelow(testLayer, "road");
     }
 
     private void updateMapFromDB() {
