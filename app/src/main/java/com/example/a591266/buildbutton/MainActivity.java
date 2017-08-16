@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent == null) {
+        if (intent == null)
+        {
             Log.i(TAG, "onNewIntent(): NULL INTENT");
             return;
         }

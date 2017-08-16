@@ -16,18 +16,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
 public class Main2Activity extends AppCompatActivity {
 
-    //calling this string whatever we want
+    //this string is to sense NFC then set NFC detected is to open app
     private static final String CONTENT_MIME_TYPE = "com.example.a591266.buildbutton/test";
 
     private static final String TAG = "Main2Activity";
@@ -72,7 +68,7 @@ public class Main2Activity extends AppCompatActivity {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null)
         {
-            Log.i(TAG, "onCreate(): no nfcAdapter available");
+            Log.i(TAG, "NFC CAT");
             Toast.makeText(this, "No NFCAdapter available", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -118,32 +114,32 @@ public class Main2Activity extends AppCompatActivity {
 //        IntentFilter tagDetected = new IntentFilter(nfcAdapter.ACTION_TAG_DISCOVERED);
 //        tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
 //
-//        //Checks for the ACTION_NDEF_DISCOVERED intent and gets the NDEF messages from an intent extra
-//        if (intent != null && nfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
-//        {
-//            Log.i(TAG, "Did not find NDEF message");
-//            Parcelable [] rawMessages =
-//                    intent.getParcelableArrayExtra(nfcAdapter.EXTRA_NDEF_MESSAGES);
-//
-//        if (nfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
-//        {
-//            Log.i(TAG, "this intent has getAction");
-//        }
-//            if (rawMessages != null)
-//            {
-//                Log.i(TAG, "Found an NDEF message");
-//                NdefMessage [] messages = new NdefMessage[rawMessages.length];
-//                for (int counter = 0; counter < rawMessages.length; counter++)
-//                {
-//                    messages[counter] = (NdefMessage) rawMessages[counter];
-//                    Log.i(TAG, messages[counter].toString());
-//                }
-//                //Process the message array
-//            }
-//        }
+        //Checks for the ACTION_NDEF_DISCOVERED intent and gets the NDEF messages from an intent extra
+        if (intent != null && nfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
+        {
+            Log.i(TAG, "Did not find NDEF message");
+            Parcelable [] rawMessages =
+                    intent.getParcelableArrayExtra(nfcAdapter.EXTRA_NDEF_MESSAGES);
 
-        //String cat = null;
-        //cat.equals("cat");
+        if (nfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
+        {
+            Log.i(TAG, "this intent has getAction");
+        }
+            if (rawMessages != null)
+            {
+                Log.i(TAG, "Found an NDEF message");
+                NdefMessage [] messages = new NdefMessage[rawMessages.length];
+                for (int counter = 0; counter < rawMessages.length; counter++)
+                {
+                    messages[counter] = (NdefMessage) rawMessages[counter];
+                    Log.i(TAG, messages[counter].toString());
+                }
+                //Process the message array
+            }
+        }
+
+        String cat = null;
+        cat.equals("cat");
 
         Tag tag_ = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         NdefRecord rec = new NdefRecord(NdefRecord.TNF_MIME_MEDIA,
